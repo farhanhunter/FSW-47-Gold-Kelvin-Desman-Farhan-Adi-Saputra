@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Presensi</title>
+    <script src="/node_modules/socket.io/client-dist/socket.io.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const socket = io();
+
+        // Mendengarkan event 'newPresensi'
+        socket.on("newPresensi", (data) => {
+          const listItem = document.createElement("li");
+          listItem.textContent = `${data.nama} - ${data.waktu}`;
+          document.getElementById("presensiList").appendChild(listItem);
+        });
+
+        // Initialize Flatpickr
+        flatpickr("#waktu", {
+          enableTime: true,
+          dateFormat: "Y-m-d H:i:S",
+          time_24hr: true,
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <h1>Presensi</h1>
+    <ul id="presensiList">
+      {{ presensi }}
+    </ul>
+    <form action="/presensi" method="POST">
+      <input type="text" name="nama" placeholder="Nama" required />
+      <input type="text" id="waktu" name="waktu" placeholder="Waktu" required />
+      <button type="submit">Tambah Presensi</button>
+    </form>
+  </body>
+</html>

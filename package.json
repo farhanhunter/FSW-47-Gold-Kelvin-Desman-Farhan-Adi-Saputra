@@ -1,0 +1,20 @@
+{
+  "name": "mvc-nodejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon app.js",
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "flatpickr": "^4.6.13",
+    "nodemon": "^3.1.3",
+    "socket.io": "^4.7.5"
+  }
+}
