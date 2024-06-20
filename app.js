@@ -16,6 +16,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Setup static files
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/node_modules", express.static(path.join(__dirname, "node_modules")));
+app.use("/views", express.static(path.join(__dirname, "views")));
 
 // Rute untuk mendapatkan presensi
 app.get("/presensi", (req, res) => {

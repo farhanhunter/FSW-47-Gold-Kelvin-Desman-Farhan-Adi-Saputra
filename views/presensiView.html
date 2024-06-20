@@ -9,32 +9,24 @@
       rel="stylesheet"
       href="/node_modules/flatpickr/dist/flatpickr.min.css"
     />
+    <link rel="stylesheet" href="/views/src/css/app.css" />
     <script src="/node_modules/flatpickr/dist/flatpickr.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const socket = io();
-
-        // Mendengarkan event 'newPresensi'
-        socket.on("newPresensi", (data) => {
-          const listItem = document.createElement("li");
-          listItem.textContent = `${data.nama} - ${data.waktu}`;
-          document.getElementById("presensiList").appendChild(listItem);
-        });
-
-        // Initialize Flatpickr
-        flatpickr("#waktu", {
-          enableTime: true,
-          dateFormat: "Y-m-d H:i:S",
-          time_24hr: true,
-        });
-      });
-    </script>
+    <script src="/views/src/js/index.js"></script>
   </head>
   <body>
     <h1>Presensi</h1>
-    <ul id="presensiList">
-      {{ presensi }}
-    </ul>
+    <table id="presensiTable">
+      <thead>
+        <tr>
+          <th>Nomor</th>
+          <th>Nama</th>
+          <th>Check-In</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ presensi }}
+      </tbody>
+    </table>
     <form action="/presensi" method="POST">
       <input type="text" name="nama" placeholder="Nama" required />
       <input type="text" id="waktu" name="waktu" placeholder="Waktu" required />

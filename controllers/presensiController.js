@@ -16,7 +16,12 @@ class PresensiController {
         const rendered = data.replace(
           "{{ presensi }}",
           presensi
-            .map((item) => `<li>${item.nama} - ${item.waktu}</li>`)
+            .map(
+              (item, index) =>
+                `<tr><td>${index + 1}</td><td>${item.nama}</td><td>${
+                  item.waktu
+                }</td></tr>`
+            )
             .join("")
         );
         res.send(rendered);
