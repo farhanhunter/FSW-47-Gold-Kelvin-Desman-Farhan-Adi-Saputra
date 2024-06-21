@@ -13,6 +13,10 @@ const port = 3001;
 // Middleware untuk meng-handle data form
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Set view engine to EJS
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
 // Setup static files
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/node_modules", express.static(path.join(__dirname, "node_modules")));

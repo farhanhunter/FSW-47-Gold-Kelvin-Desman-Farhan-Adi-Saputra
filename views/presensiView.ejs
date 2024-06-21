@@ -21,15 +21,46 @@
           <th>Nomor</th>
           <th>Nama</th>
           <th>Check-In</th>
+          <th>Check-Out</th>
         </tr>
       </thead>
       <tbody>
-        {{ presensi }}
+        <% presensi.forEach((presensi, index) => { %>
+        <tr>
+          <td><%= index + 1 %></td>
+          <td>
+            <a href="<%= presensi.socialMedia %>" target="_blank"
+              ><%= presensi.nama %></a
+            >
+          </td>
+          <td><%= presensi.checkin %></td>
+          <td><%= presensi.checkout %></td>
+        </tr>
+        <% }) %>
       </tbody>
     </table>
     <form action="/presensi" method="POST">
       <input type="text" name="nama" placeholder="Nama" required />
-      <input type="text" id="waktu" name="waktu" placeholder="Waktu" required />
+      <input
+        type="text"
+        id="checkin"
+        name="checkin"
+        placeholder="Check-In"
+        required
+      />
+      <input
+        type="text"
+        id="checkout"
+        name="checkout"
+        placeholder="Check-Out"
+        required
+      />
+      <input
+        type="text"
+        name="socialMedia"
+        placeholder="Link Sosial Media"
+        required
+      />
       <button type="submit">Tambah Presensi</button>
     </form>
   </body>

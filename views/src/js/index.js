@@ -2,21 +2,30 @@ document.addEventListener("DOMContentLoaded", function () {
   const socket = io();
 
   // Mendengarkan event 'newPresensi'
-  socket.on("newPresensi", (data) => {
-    const table = document
+  socket.on("newPresensi", (presensi) => {
+    const tableBody = document
       .getElementById("presensiTable")
       .getElementsByTagName("tbody")[0];
     const row = table.insertRow();
-    const cell1 = row.insertCell(0);
-    const cell2 = row.insertCell(1);
-    const cell3 = row.insertCell(2);
-    cell1.textContent = table.rows.length;
-    cell2.textContent = data.nama;
-    cell3.textContent = data.waktu;
+    const cellNumber = row.insertCell(0);
+    const cellName = row.insertCell(1);
+    const cellCheckin = row.insertCell(2);
+    const cellCheckout = row.insertCell(3);
+    cellNumber.textContent = tableBody.rows.length;
+    cellName.innerHTML = `<a href="${presensi.socialMedia}" target="_blank">${presensi.nama}</a>`;
+    cellCheckin.textContent = presensi.checkin;
+    cellCheckout.textContent = presensi.checkout;
   });
 
-  // Initialize Flatpickr
-  flatpickr("#waktu", {
+  // Initialize Flatpickr for check in
+  flatpickr("#checkin", {
+    enableTime: true,
+    dateFormat: "Y-m-d H:i:S",
+    time_24hr: true,
+  });
+
+  // Initialize Flatpickr for check out
+  flatpickr("#checkout", {
     enableTime: true,
     dateFormat: "Y-m-d H:i:S",
     time_24hr: true,

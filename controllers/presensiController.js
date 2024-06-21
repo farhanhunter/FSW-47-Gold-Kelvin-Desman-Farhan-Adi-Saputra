@@ -1,40 +1,20 @@
 const presensiModel = require("../models/presensiModel");
-const fs = require("fs");
-const path = require("path");
 
 class PresensiController {
   getPresensi(req, res) {
-    const presensi = presensiModel.getAllPresensi();
-    fs.readFile(
-      path.join(__dirname, "../views/presensiView.html"),
-      "utf8",
-      (err, data) => {
-        if (err) {
-          res.status(500).send("Page Not Found");
-          return;
-        }
-        const rendered = data.replace(
-          "{{ presensi }}",
-          presensi
-            .map(
-              (item, index) =>
-                `<tr><td>${index + 1}</td><td>${item.nama}</td><td>${
-                  item.waktu
-                }</td></tr>`
-            )
-            .join("")
-        );
-        res.send(rendered);
-      }
-    );
+    const presensiList = presensiModel.getAllPresensi();
+    res.render("presensiView", { presensi: presensiList });
   }
+
   postPresensi(req, res, callback) {
     const newPresensi = {
       nama: req.body.nama,
-      waktu: req.body.waktu,
+      checkin: req.body.checkin,
+      checkout: req.body.checkout,
+      socialMedia: req.body.socialMedia,
     };
-    presensiModel.postPresensi(newPresensi);
-    callback(newPresensi); // Panggil callback setelah menambahkan presensi baru
+    presensiModel.upsertPresensi(newPresensi);
+    callback(newPresensi); // Call callback after adding new presensi
   }
 }
 
