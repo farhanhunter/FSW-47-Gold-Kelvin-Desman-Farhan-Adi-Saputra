@@ -10,7 +10,7 @@ const server = http.createServer(app);
 const io = socketIo(server);
 const port = 3001;
 
-// Middleware untuk meng-handle data form
+// Middleware for handling form data
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Set view engine to EJS
@@ -20,14 +20,12 @@ app.set("views", path.join(__dirname, "views"));
 // Setup static files
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/node_modules", express.static(path.join(__dirname, "node_modules")));
-app.use("/views", express.static(path.join(__dirname, "views")));
 
-// Rute untuk mendapatkan presensi
+// Routes for presensi
 app.get("/presensi", (req, res) => {
   presensiController.getPresensi(req, res);
 });
 
-// Rute untuk menambah presensi
 app.post("/presensi", (req, res) => {
   presensiController.postPresensi(req, res, (newPresensi) => {
     io.emit("newPresensi", newPresensi);
@@ -35,12 +33,12 @@ app.post("/presensi", (req, res) => {
   });
 });
 
-// Middleware untuk menangani error 404
+// Middleware for handling 404 errors
 app.use((req, res) => {
   res.status(404).send("Page Not Found");
 });
 
-// Menghubungkan Socket.IO
+// Connect Socket.IO
 io.on("connection", (socket) => {
   console.log("New client connected");
   socket.on("disconnect", () => {
@@ -48,7 +46,7 @@ io.on("connection", (socket) => {
   });
 });
 
-// Menjalankan Server
+// Start the server
 server.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
