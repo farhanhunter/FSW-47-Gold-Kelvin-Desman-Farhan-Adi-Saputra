@@ -1,4 +1,4 @@
-class provinsiModel {
+class ProvinsiModel {
   constructor() {
     this.items = [];
   }
@@ -12,4 +12,4 @@ class provinsiModel {
   }
 }
 
-module.exports = new provinsiModel();
+export default new ProvinsiModel();

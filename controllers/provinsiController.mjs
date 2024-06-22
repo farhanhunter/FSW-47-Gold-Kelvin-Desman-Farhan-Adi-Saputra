@@ -1,6 +1,4 @@
-const provinsiModel = require("../models/provinsiModel");
-const fs = require("fs");
-const path = require("path");
+import provinsiModel from "../models/provinsiModel.mjs";
 
 class ProvinsiController {
   getProvinsi(req, res) {
@@ -10,9 +8,9 @@ class ProvinsiController {
 
   addProvinsi(req, res) {
     const newItem = new URLSearchParams(req.body).get("provinsi");
-    provinsiModel.addProvinsi(provinsi);
+    provinsiModel.addProvinsi(newItem);
     res.redirect("/provinsi");
   }
 }
 
-module.exports = ProvinsiController;
+export default new ProvinsiController();

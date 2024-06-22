@@ -1,17 +1,17 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const path = require("path");
-const http = require("http");
-const socketIo = require("socket.io");
-const expressLayouts = require("express-ejs-layouts");
-const presensiController = require("./controllers/presensiController");
-const ProvinsiController = require("./controllers/provinsiController");
+import express from "express";
+import bodyParser from "body-parser";
+import path from "path";
+import http from "http";
+import { Server as socketIo } from "socket.io";
+import expressLayouts from "express-ejs-layouts";
+import presensiController from "./controllers/presensiController.mjs";
+import provinsiController from "./controllers/provinsiController.mjs";
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = new socketIo(server);
 const port = 3001;
-const provinsiController = new ProvinsiController();
+// const provinsiController = new ProvinsiController();
 
 // Middleware for handling form data
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -19,12 +19,15 @@ app.use(express.urlencoded({ extended: true }));
 
 // Set view engine to EJS
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
+app.set("views", path.join(process.cwd(), "views"));
 app.use(expressLayouts);
 
 // Setup static files
-app.use(express.static(path.join(__dirname, "public")));
-app.use("/node_modules", express.static(path.join(__dirname, "node_modules")));
+app.use(express.static(path.join(process.cwd(), "public")));
+app.use(
+  "/node_modules",
+  express.static(path.join(process.cwd(), "node_modules"))
+);
 
 // Routes for presensi
 app.get("/", (req, res) => {
@@ -38,7 +41,7 @@ app.get("/provinsi", (req, res) => {
 app.post("/", (req, res) => {
   presensiController.postPresensi(req, res, (newPresensi) => {
     io.emit("newPresensi", newPresensi);
-    res.redirect("/presensi");
+    res.redirect("/");
   });
 });
 

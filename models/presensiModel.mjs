@@ -36,4 +36,4 @@ class PresensiModel {
   }
 }
 
-module.exports = new PresensiModel();
+export default new PresensiModel();

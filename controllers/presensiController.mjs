@@ -1,4 +1,4 @@
-const presensiModel = require("../models/presensiModel");
+import presensiModel from "../models/presensiModel.mjs";
 
 class PresensiController {
   getPresensi(req, res) {
@@ -18,4 +18,4 @@ class PresensiController {
   }
 }
 
-module.exports = new PresensiController();
+export default new PresensiController();
