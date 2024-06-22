@@ -28,9 +28,29 @@ class PresensiModel {
     const existingPresensiIndex = presensiList.findIndex(
       (presensi) => this.normalizeName(presensi.nama) === normalizedNama
     );
+
     if (existingPresensiIndex !== -1) {
-      presensiList[existingPresensiIndex] = presensiData;
+      // Update the existing entry
+      const existingPresensi = presensiList[existingPresensiIndex];
+
+      // Only update check-in if provided
+      if (presensiData.checkin) {
+        existingPresensi.checkin = presensiData.checkin;
+      }
+
+      // Only update check-out if provided
+      if (presensiData.checkout) {
+        existingPresensi.checkout = presensiData.checkout;
+      }
+
+      // Update social media if provided
+      if (presensiData.socialMedia) {
+        existingPresensi.socialMedia = presensiData.socialMedia;
+      }
+
+      presensiList[existingPresensiIndex] = existingPresensi;
     } else {
+      // Add new entry
       presensiList.push(presensiData);
     }
   }
