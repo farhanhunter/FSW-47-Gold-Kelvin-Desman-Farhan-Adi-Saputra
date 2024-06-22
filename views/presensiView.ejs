@@ -16,7 +16,10 @@
   <body class="bg-gray-100 text-gray-800">
     <div class="container mx-auto p-4">
       <h1 class="text-3xl font-bold text-center mb-4">Presensi</h1>
-      <table class="w-full table-auto bg-white shadow-md rounded-lg">
+      <table
+        id="presensiTable"
+        class="w-full table-auto bg-white shadow-md rounded-lg"
+      >
         <thead>
           <tr class="bg-gray-200 text-left">
             <th class="px-4 py-2">Nomor</th>
@@ -44,7 +47,7 @@
         </tbody>
       </table>
       <form
-        action="/presensi"
+        action="/"
         method="POST"
         class="mt-4 bg-white p-4 shadow-md rounded-lg"
       >
