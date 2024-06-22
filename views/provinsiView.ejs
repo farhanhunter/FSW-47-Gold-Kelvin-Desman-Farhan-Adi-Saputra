@@ -7,9 +7,9 @@
   </head>
   <body>
     <h1>Provinsi</h1>
-    <ul>
-      {{provinsi}}
-    </ul>
+    <% provinsi.forEach(function (data) { %>
+    <li><%= data %></li>
+    <% }) %>
     <form action="/provinsi" method="POST">
       <input type="text" name="provinsi" placeholder="Provinsi" />
       <button type="submit">Add Provinsi</button>
