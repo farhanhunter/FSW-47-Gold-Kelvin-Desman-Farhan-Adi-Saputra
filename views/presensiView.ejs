@@ -29,9 +29,11 @@
           </tr>
         </thead>
         <tbody>
-          <% presensi.forEach((item, index) => { %>
+          <% presensi.results.forEach((item, index) => { %>
           <tr class="border-b">
-            <td class="px-4 py-2"><%= index + 1 %></td>
+            <td class="px-4 py-2">
+              <%= (presensi.page - 1) * 10 + index + 1 %>
+            </td>
             <td class="px-4 py-2">
               <a
                 href="<%= item.socialMedia %>"
@@ -46,6 +48,24 @@
           <% }) %>
         </tbody>
       </table>
+      <!-- Pagination Controls -->
+      <div class="pagination flex justify-center mt-4">
+        <% if (presensi.previous) { %>
+        <a
+          href="/?page=<%= presensi.previous.page %>"
+          class="px-4 py-2 bg-dark-blue text-gray-100 rounded hover:bg-light-blue"
+          >Previous</a
+        >
+        <% } %>
+        <span class="px-4 py-2">Page <%= presensi.page %></span>
+        <% if (presensi.next) { %>
+        <a
+          href="/?page=<%= presensi.next.page %>"
+          class="px-4 py-2 bg-dark-blue text-gray-100 rounded hover:bg-light-blue"
+          >Next</a
+        >
+        <% } %>
+      </div>
       <form
         action="/"
         method="POST"

@@ -1,15 +1,26 @@
-let presensiList = [
-  {
-    nama: "Example Name",
-    checkin: "2024-06-20 19:00:00",
-    checkout: "2024-06-20 22:00:00",
-    socialMedia: "https://example.com",
-  },
-];
-
 class PresensiModel {
+  constructor() {
+    this.presensiList = [
+      {
+        nama: "Example Name",
+        checkin: "2024-06-20 19:00:00",
+        checkout: "2024-06-20 22:00:00",
+        socialMedia: "https://example.com",
+      },
+      // Add more presensi objects here for testing
+    ];
+  }
+
   getAllPresensi() {
-    return presensiList;
+    return this.presensiList;
+  }
+
+  getPaginatedPresensi(startIndex, limit) {
+    return this.presensiList.slice(startIndex, startIndex + limit);
+  }
+
+  countDocuments() {
+    return this.presensiList.length;
   }
 
   formatName(name) {
@@ -25,13 +36,13 @@ class PresensiModel {
     const formattedNama = this.formatName(presensiData.nama);
     presensiData.nama = formattedNama;
 
-    const existingPresensiIndex = presensiList.findIndex(
+    const existingPresensiIndex = this.presensiList.findIndex(
       (presensi) => this.normalizeName(presensi.nama) === normalizedNama
     );
 
     if (existingPresensiIndex !== -1) {
       // Update the existing entry
-      const existingPresensi = presensiList[existingPresensiIndex];
+      const existingPresensi = this.presensiList[existingPresensiIndex];
 
       // Only update check-in if provided
       if (presensiData.checkin) {
@@ -48,10 +59,10 @@ class PresensiModel {
         existingPresensi.socialMedia = presensiData.socialMedia;
       }
 
-      presensiList[existingPresensiIndex] = existingPresensi;
+      this.presensiList[existingPresensiIndex] = existingPresensi;
     } else {
       // Add new entry
-      presensiList.push(presensiData);
+      this.presensiList.push(presensiData);
     }
   }
 }

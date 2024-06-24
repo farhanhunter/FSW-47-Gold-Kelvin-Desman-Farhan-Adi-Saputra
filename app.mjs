@@ -4,16 +4,21 @@ import path from "path";
 import http from "http";
 import { Server as socketIo } from "socket.io";
 import expressLayouts from "express-ejs-layouts";
-import presensiController from "./controllers/presensiController.mjs";
-import provinsiController from "./controllers/provinsiController.mjs";
+import morgan from "morgan";
+import presensiRoutes from "./routes/presensiRoutes.mjs";
+import portofolioRoutes from "./routes/portofolioRoutes.mjs"; // Updated to portofolio routes
+import errorRoutes from "./routes/errorRoutes.mjs"; // Import error routes
 
 const app = express();
 const server = http.createServer(app);
 const io = new socketIo(server);
 const port = 3001;
-// const provinsiController = new ProvinsiController();
+
+// Use Morgan for logging HTTP requests
+app.use(morgan("combined"));
 
 // Middleware for handling form data
+app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -29,30 +34,12 @@ app.use(
   express.static(path.join(process.cwd(), "node_modules"))
 );
 
-// Routes for presensi
-app.get("/", (req, res) => {
-  presensiController.getPresensi(req, res);
-});
+// Routes
+app.use("/", presensiRoutes);
+app.use("/portofolio", portofolioRoutes); // Updated to portofolio routes
 
-app.get("/provinsi", (req, res) => {
-  provinsiController.getProvinsi(req, res);
-});
-
-app.post("/", (req, res) => {
-  presensiController.postPresensi(req, res, (newPresensi) => {
-    io.emit("newPresensi", newPresensi);
-    res.redirect("/");
-  });
-});
-
-app.post("/provinsi", (req, res) => {
-  provinsiController.addProvinsi(req, res);
-});
-
-// Middleware for handling 404 errors
-app.use((req, res) => {
-  res.status(404).send("Page Not Found");
-});
+// Middleware for handling 404 errors using custom error view
+app.use(errorRoutes);
 
 // Connect Socket.IO
 io.on("connection", (socket) => {
@@ -61,6 +48,9 @@ io.on("connection", (socket) => {
     console.log("Client disconnected");
   });
 });
+
+// Attach io to app
+app.set("io", io);
 
 // Start the server
 server.listen(port, () => {
