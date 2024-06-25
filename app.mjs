@@ -25,7 +25,6 @@ app.use(express.urlencoded({ extended: true }));
 // Set view engine to EJS
 app.set("view engine", "ejs");
 app.set("views", path.join(process.cwd(), "views"));
-app.use(expressLayouts);
 
 // Setup static files
 app.use(express.static(path.join(process.cwd(), "public")));
@@ -33,6 +32,9 @@ app.use(
   "/node_modules",
   express.static(path.join(process.cwd(), "node_modules"))
 );
+
+// Use express-ejs-layouts
+app.use(expressLayouts);
 
 // Routes
 app.use("/", presensiRoutes);
