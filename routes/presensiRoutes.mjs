@@ -1,17 +1,15 @@
+// presensiRoutes.mjs
 import express from "express";
 import presensiController from "../controllers/presensiController.mjs";
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  presensiController.getPresensi(req, res);
+router.get("/", (req, res, next) => {
+  presensiController.getPresensi(req, res, next);
 });
 
-router.post("/", (req, res) => {
-  presensiController.postPresensi(req, res, (newPresensi) => {
-    req.app.get("io").emit("newPresensi", newPresensi);
-    res.redirect("/");
-  });
+router.post("/", (req, res, next) => {
+  presensiController.postPresensi(req, res, next);
 });
 
 export default router;

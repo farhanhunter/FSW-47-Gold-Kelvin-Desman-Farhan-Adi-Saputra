@@ -49,9 +49,15 @@ class PresensiModel {
         existingPresensi.checkin = presensiData.checkin;
       }
 
-      // Only update check-out if provided
+      // Only update check-out if provided and check-in exists
       if (presensiData.checkout) {
-        existingPresensi.checkout = presensiData.checkout;
+        if (existingPresensi.checkin) {
+          existingPresensi.checkout = presensiData.checkout;
+        } else {
+          throw new Error(
+            "Check-in must be present before check-out can be added."
+          );
+        }
       }
 
       // Update social media if provided
@@ -61,6 +67,11 @@ class PresensiModel {
 
       this.presensiList[existingPresensiIndex] = existingPresensi;
     } else {
+      // Check-in must be provided for new entries
+      if (!presensiData.checkin) {
+        throw new Error("Check-in must be provided for new entries.");
+      }
+
       // Add new entry
       this.presensiList.push(presensiData);
     }

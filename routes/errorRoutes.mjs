@@ -1,9 +1,16 @@
-import { Router } from "express";
-import { handleError } from "../controllers/errorController.mjs";
+// errorRoutes.mjs
+import express from "express";
+import {
+  handleNotFound,
+  handleError,
+} from "../controllers/errorController.mjs";
 
-const router = Router();
+const router = express.Router();
 
-// Catch all routes and handle errors
-router.use("*", handleError);
+// Handle 404 errors
+router.use(handleNotFound);
+
+// Handle other errors
+router.use(handleError);
 
 export default router;

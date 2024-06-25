@@ -1,45 +1,60 @@
+// presensiController.mjs
 import presensiModel from "../models/presensiModel.mjs";
 
 class PresensiController {
-  getPresensi(req, res) {
-    const page = parseInt(req.query.page) || 1; // Get the current page from query parameter or default to 1
-    const limit = 10; // Number of items per page
-    const startIndex = (page - 1) * limit; // Calculate the starting index for the current page
-    const endIndex = page * limit; // Calculate the ending index for the current page
+  getPresensi(req, res, next) {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = 10;
+      const startIndex = (page - 1) * limit;
+      const endIndex = page * limit;
 
-    const presensiList = presensiModel.getPaginatedPresensi(startIndex, limit); // Fetch the paginated data
-    const totalCount = presensiModel.countDocuments(); // Get the total number of documents
+      const presensiList = presensiModel.getPaginatedPresensi(
+        startIndex,
+        limit
+      );
+      const totalCount = presensiModel.countDocuments();
 
-    const results = {
-      results: presensiList,
-      page: page,
-      totalCount: totalCount,
-    };
-
-    if (endIndex < totalCount) {
-      results.next = {
-        page: page + 1,
+      const results = {
+        results: presensiList,
+        page: page,
+        totalCount: totalCount,
       };
-    }
 
-    if (startIndex > 0) {
-      results.previous = {
-        page: page - 1,
-      };
-    }
+      if (endIndex < totalCount) {
+        results.next = {
+          page: page + 1,
+        };
+      }
 
-    res.render("presensiView", { presensi: results }); // Pass the paginated results to the view
+      if (startIndex > 0) {
+        results.previous = {
+          page: page - 1,
+        };
+      }
+
+      res.render("presensiView", { presensi: results });
+    } catch (error) {
+      next(error);
+    }
   }
 
-  postPresensi(req, res, callback) {
-    const newPresensi = {
-      nama: req.body.nama,
-      checkin: req.body.checkin,
-      checkout: req.body.checkout,
-      socialMedia: req.body.socialMedia,
-    };
-    presensiModel.upsertPresensi(newPresensi);
-    callback(newPresensi); // Call callback after adding new presensi
+  async postPresensi(req, res, next) {
+    try {
+      const { nama, checkin, checkout, socialMedia } = req.body;
+
+      if (!checkin) {
+        throw new Error("Check-in must be provided for new entries");
+      }
+
+      const newPresensi = { nama, checkin, checkout, socialMedia };
+
+      await presensiModel.upsertPresensi(newPresensi);
+      req.app.get("io").emit("newPresensi", newPresensi);
+      res.redirect("/");
+    } catch (error) {
+      next(error);
+    }
   }
 }
 
