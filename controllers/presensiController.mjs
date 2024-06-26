@@ -33,6 +33,12 @@ class PresensiController {
         };
       }
 
+      if (presensiModel.errorMssg != " ") {
+        results.errorMssg = "Can not entry Data , Check in must be filled";
+      }
+
+      console.log(results);
+
       res.render("presensiView", { presensi: results });
     } catch (error) {
       next(error);
@@ -43,9 +49,9 @@ class PresensiController {
     try {
       const { nama, checkin, checkout, socialMedia } = req.body;
 
-      if (!checkin) {
-        throw new Error("Check-in must be provided for new entries");
-      }
+      // if (!checkin) {
+      //   throw new Error("Check-in must be provided for new entries");
+      // }
 
       const newPresensi = { nama, checkin, checkout, socialMedia };
 

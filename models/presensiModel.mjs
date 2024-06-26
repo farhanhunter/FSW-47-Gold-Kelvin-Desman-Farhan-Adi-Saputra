@@ -1,14 +1,16 @@
 class PresensiModel {
   constructor() {
     this.presensiList = [
-      {
-        nama: "Example Name",
-        checkin: "2024-06-20 19:00:00",
-        checkout: "2024-06-20 22:00:00",
-        socialMedia: "https://example.com",
-      },
+      // {
+      //   nama: "Example Name",
+      //   checkin: "2024-06-20 19:00:00",
+      //   checkout: "2024-06-20 22:00:00",
+      //   socialMedia: "https://example.com",
+      // },
       // Add more presensi objects here for testing
     ];
+
+    this.errorMssg;
   }
 
   getAllPresensi() {
@@ -54,9 +56,12 @@ class PresensiModel {
         if (existingPresensi.checkin) {
           existingPresensi.checkout = presensiData.checkout;
         } else {
-          throw new Error(
-            "Check-in must be present before check-out can be added."
-          );
+          // throw new Error(
+          //   "Check-in must be present before check-out can be added."
+          // );
+
+          this.errorMssg =
+            "Check-in must be present before check-out can be added.";
         }
       }
 
@@ -69,11 +74,13 @@ class PresensiModel {
     } else {
       // Check-in must be provided for new entries
       if (!presensiData.checkin) {
-        throw new Error("Check-in must be provided for new entries.");
+        this.errorMssg = "Check-in must be provided for new entries.";
+      } else {
+        console.log(this.errorMssg);
+        this.errorMssg = " ";
+        // Add new entry
+        this.presensiList.push(presensiData);
       }
-
-      // Add new entry
-      this.presensiList.push(presensiData);
     }
   }
 }

@@ -16,6 +16,17 @@
   <body class="bg-gray-100 text-gray-800">
     <div class="container mx-auto p-4">
       <h1 class="text-3xl font-bold text-center mb-4">Presensi</h1>
+
+      <!-- Notification Container -->
+      <% if (presensi.errorMssg != null && presensi.errorMssg.trim() !== "") {
+      %>
+      <div
+        class="bg-red-500 text-white text-center py-2 px-4 rounded mb-4 shadow-lg"
+      >
+        <%= presensi.errorMssg %>
+      </div>
+      <% } %>
+
       <table
         id="presensiTable"
         class="w-full table-auto bg-white shadow-md rounded-lg"
@@ -29,7 +40,12 @@
           </tr>
         </thead>
         <tbody>
-          <% presensi.results.forEach((item, index) => { %>
+          <% if (presensi.results.length === 0) { %>
+          <tr class="border-b">
+            <td colspan="4" class="px-4 py-2 text-center">Tidak ada data</td>
+          </tr>
+          <% } %> <% if (presensi.results.length > 0) { %> <%
+          presensi.results.forEach((item, index) => { %>
           <tr class="border-b">
             <td class="px-4 py-2">
               <%= (presensi.page - 1) * 10 + index + 1 %>
@@ -38,14 +54,14 @@
               <a
                 href="<%= item.socialMedia %>"
                 target="_blank"
-                class="text-dark-blue hover:text-light-blue"
+                class="text-blue-600 hover:text-blue-800"
                 ><%= item.nama %></a
               >
             </td>
             <td class="px-4 py-2"><%= item.checkin %></td>
             <td class="px-4 py-2"><%= item.checkout %></td>
           </tr>
-          <% }) %>
+          <% }) %> <% } %>
         </tbody>
       </table>
       <!-- Pagination Controls -->
@@ -53,7 +69,7 @@
         <% if (presensi.previous) { %>
         <a
           href="/?page=<%= presensi.previous.page %>"
-          class="px-4 py-2 bg-dark-blue text-gray-100 rounded hover:bg-light-blue"
+          class="px-4 py-2 bg-blue-600 text-gray-100 rounded hover:bg-blue-800"
           >Previous</a
         >
         <% } %>
@@ -61,7 +77,7 @@
         <% if (presensi.next) { %>
         <a
           href="/?page=<%= presensi.next.page %>"
-          class="px-4 py-2 bg-dark-blue text-gray-100 rounded hover:bg-light-blue"
+          class="px-4 py-2 bg-blue-600 text-gray-100 rounded hover:bg-blue-800"
           >Next</a
         >
         <% } %>
