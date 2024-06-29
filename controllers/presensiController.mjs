@@ -1,43 +1,34 @@
-// presensiController.mjs
-import presensiModel from "../models/presensiModel.mjs";
+import PresensiModel from "../models/presensiModel.mjs";
 
 class PresensiController {
-  getPresensi(req, res, next) {
+  async getPresensi(req, res, next) {
     try {
       const page = parseInt(req.query.page) || 1;
-      const limit = 10;
+      const limit = 5;
       const startIndex = (page - 1) * limit;
       const endIndex = page * limit;
 
-      const presensiList = presensiModel.getPaginatedPresensi(
+      const presensiList = await PresensiModel.getPaginatedPresensi(
         startIndex,
         limit
       );
-      const totalCount = presensiModel.countDocuments();
+      const totalCount = await PresensiModel.countDocuments();
 
       const results = {
         results: presensiList,
         page: page,
         totalCount: totalCount,
+        previous: page > 1 ? { page: page - 1 } : null,
+        next: endIndex < totalCount ? { page: page + 1 } : null,
       };
 
-      if (endIndex < totalCount) {
-        results.next = {
-          page: page + 1,
-        };
+      if (PresensiModel.errorMssg != "") {
+        results.errorMssg = PresensiModel.errorMssg;
+        results.successMsg = "";
+      } else {
+        results.successMsg = PresensiModel.successMsg;
+        PresensiModel.successMsg = "";
       }
-
-      if (startIndex > 0) {
-        results.previous = {
-          page: page - 1,
-        };
-      }
-
-      if (presensiModel.errorMssg != " ") {
-        results.errorMssg = "Can not entry Data , Check in must be filled";
-      }
-
-      console.log(results);
 
       res.render("presensiView", { presensi: results });
     } catch (error) {
@@ -47,17 +38,70 @@ class PresensiController {
 
   async postPresensi(req, res, next) {
     try {
-      const { nama, checkin, checkout, socialMedia } = req.body;
+      const { nama, user_id, checkin, checkout, role } = req.body;
 
-      // if (!checkin) {
-      //   throw new Error("Check-in must be provided for new entries");
-      // }
+      const newPresensi = {
+        nama,
+        user_id,
+        checkin,
+        checkout,
+        role,
+      };
 
-      const newPresensi = { nama, checkin, checkout, socialMedia };
+      // Validasi bahwa checkin tidak boleh kosong
+      if (!checkin) {
+        PresensiModel.errorMssg = "Clock-in harus diisi.";
+        const presensiList = await PresensiModel.getPaginatedPresensi(0, 5);
+        const totalCount = await PresensiModel.countDocuments();
+        const results = {
+          results: presensiList,
+          page: 1,
+          totalCount: totalCount,
+          errorMssg: PresensiModel.errorMssg,
+          successMsg: PresensiModel.successMsg,
+          previous: null,
+          next: 5 < totalCount ? { page: 2 } : null,
+        };
+        res.render("presensiView", { presensi: results });
+        return;
+      }
 
-      await presensiModel.upsertPresensi(newPresensi);
+      // Validasi bahwa checkout tidak boleh kosong jika checkin sudah ada
+      if (!checkout && checkin) {
+        PresensiModel.errorMssg = "Clock-out harus diisi.";
+        const presensiList = await PresensiModel.getPaginatedPresensi(0, 5);
+        const totalCount = await PresensiModel.countDocuments();
+        const results = {
+          results: presensiList,
+          page: 1,
+          totalCount: totalCount,
+          errorMssg: PresensiModel.errorMssg,
+          successMsg: PresensiModel.successMsg,
+          previous: null,
+          next: 5 < totalCount ? { page: 2 } : null,
+        };
+        res.render("presensiView", { presensi: results });
+        return;
+      }
+
+      await PresensiModel.insertOrUpdatePresensi(newPresensi);
+
+      const presensiList = await PresensiModel.getPaginatedPresensi(0, 5);
+      const totalCount = await PresensiModel.countDocuments();
+
+      const results = {
+        results: presensiList,
+        page: 1,
+        totalCount: totalCount,
+        errorMssg: PresensiModel.errorMssg,
+        successMsg: PresensiModel.successMsg,
+        previous: null,
+        next: 5 < totalCount ? { page: 2 } : null,
+      };
+
       req.app.get("io").emit("newPresensi", newPresensi);
-      res.redirect("/");
+
+      res.render("presensiView", { presensi: results });
     } catch (error) {
       next(error);
     }

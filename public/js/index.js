@@ -1,19 +1,38 @@
 document.addEventListener("DOMContentLoaded", function () {
   const socket = io();
 
-  socket.on("newPresensi", (presensi) => {
-    const tableBody = document
-      .getElementById("presensiTable")
-      .getElementsByTagName("tbody")[0];
-    const row = tableBody.insertRow();
-    const cellNumber = row.insertCell(0);
-    const cellName = row.insertCell(1);
-    const cellCheckin = row.insertCell(2);
-    const cellCheckout = row.insertCell(3);
-    cellNumber.textContent = tableBody.rows.length;
-    cellName.innerHTML = `<a href="${presensi.socialMedia}" target="_blank" class="text-dark-blue hover:text-light-blue">${presensi.nama}</a>`;
-    cellCheckin.textContent = presensi.checkin;
-    cellCheckout.textContent = presensi.checkout;
+  socket.on("newPresensi", (data) => {
+    const currentPage =
+      parseInt(document.getElementById("page-number").value) || 1;
+    const limit = 5;
+
+    // Check if the new presensi is on the current page
+    if (data.page === currentPage) {
+      // Fetch the updated data for the current page
+      fetch(`/?page=${currentPage}`)
+        .then((response) => response.text())
+        .then((data) => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(data, "text/html");
+          const newTableBody = doc
+            .getElementById("presensiTable")
+            .getElementsByTagName("tbody")[0];
+          const currentTableBody = document
+            .getElementById("presensiTable")
+            .getElementsByTagName("tbody")[0];
+
+          // Replace the current table body with the new one
+          currentTableBody.innerHTML = newTableBody.innerHTML;
+
+          // Update the pagination controls
+          const newPageNumber = doc.getElementById("page-number").value;
+          document.getElementById("page-number").value = newPageNumber;
+
+          const paginationControls = doc.querySelector(".pagination");
+          document.querySelector(".pagination").innerHTML =
+            paginationControls.innerHTML;
+        });
+    }
   });
 
   flatpickr("#checkin", {

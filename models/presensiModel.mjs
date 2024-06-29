@@ -1,28 +1,105 @@
+import connection from "../config/database.js";
+
 class PresensiModel {
   constructor() {
-    this.presensiList = [
-      // {
-      //   nama: "Example Name",
-      //   checkin: "2024-06-20 19:00:00",
-      //   checkout: "2024-06-20 22:00:00",
-      //   socialMedia: "https://example.com",
-      // },
-      // Add more presensi objects here for testing
-    ];
-
-    this.errorMssg;
+    this.errorMssg = "";
+    this.successMsg = "";
   }
 
-  getAllPresensi() {
-    return this.presensiList;
+  async getAllPresensi() {
+    const db = connection();
+
+    return new Promise((resolve, reject) => {
+      db.connect((err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        const selectQuery = "SELECT * FROM attendances";
+        db.query(selectQuery, (err, results) => {
+          db.end();
+
+          if (err) {
+            reject(err);
+          } else {
+            resolve(results);
+          }
+        });
+      });
+    });
   }
 
-  getPaginatedPresensi(startIndex, limit) {
-    return this.presensiList.slice(startIndex, startIndex + limit);
+  async getPaginatedPresensi(startIndex, limit) {
+    const db = connection();
+
+    return new Promise((resolve, reject) => {
+      db.connect((err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        const selectQuery = "SELECT * FROM attendances LIMIT ?, ?";
+        db.query(selectQuery, [startIndex, limit], (err, results) => {
+          db.end();
+
+          if (err) {
+            reject(err);
+          } else {
+            resolve(results);
+          }
+        });
+      });
+    });
   }
 
-  countDocuments() {
-    return this.presensiList.length;
+  async countDocuments() {
+    const db = connection();
+
+    return new Promise((resolve, reject) => {
+      db.connect((err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        const countQuery = "SELECT COUNT(*) AS count FROM attendances";
+        db.query(countQuery, (err, results) => {
+          db.end();
+
+          if (err) {
+            reject(err);
+          } else {
+            resolve(results[0].count);
+          }
+        });
+      });
+    });
+  }
+
+  async readPresensi() {
+    const db = connection();
+
+    return new Promise((resolve, reject) => {
+      db.connect((err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        const selectQuery = "SELECT * FROM attendances";
+        db.query(selectQuery, (err, results) => {
+          db.end();
+
+          if (err) {
+            reject(err);
+          } else {
+            resolve(results);
+          }
+        });
+      });
+    });
   }
 
   formatName(name) {
@@ -33,55 +110,97 @@ class PresensiModel {
     return name.trim().toLowerCase();
   }
 
-  upsertPresensi(presensiData) {
-    const normalizedNama = this.normalizeName(presensiData.nama);
-    const formattedNama = this.formatName(presensiData.nama);
-    presensiData.nama = formattedNama;
+  capitalizeName(name) {
+    return name
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  }
 
-    const existingPresensiIndex = this.presensiList.findIndex(
-      (presensi) => this.normalizeName(presensi.nama) === normalizedNama
-    );
+  async insertOrUpdatePresensi(presensiData) {
+    const userId = presensiData.user_id;
+    const nama = this.capitalizeName(presensiData.nama); // Capitalize name
+    const clockIn = presensiData.checkin;
+    const clockOut = presensiData.checkout;
+    const role = presensiData.role;
 
-    if (existingPresensiIndex !== -1) {
-      // Update the existing entry
-      const existingPresensi = this.presensiList[existingPresensiIndex];
+    const db = connection();
 
-      // Only update check-in if provided
-      if (presensiData.checkin) {
-        existingPresensi.checkin = presensiData.checkin;
-      }
-
-      // Only update check-out if provided and check-in exists
-      if (presensiData.checkout) {
-        if (existingPresensi.checkin) {
-          existingPresensi.checkout = presensiData.checkout;
-        } else {
-          // throw new Error(
-          //   "Check-in must be present before check-out can be added."
-          // );
-
-          this.errorMssg =
-            "Check-in must be present before check-out can be added.";
+    return new Promise((resolve, reject) => {
+      db.connect((err) => {
+        if (err) {
+          reject(err);
+          return;
         }
-      }
 
-      // Update social media if provided
-      if (presensiData.socialMedia) {
-        existingPresensi.socialMedia = presensiData.socialMedia;
-      }
+        const selectQuery =
+          "SELECT * FROM attendances WHERE user_id = ? AND DATE(clock_in) = DATE(?)";
+        db.query(selectQuery, [userId, clockIn], (err, result) => {
+          if (err) {
+            db.end();
+            reject(err);
+            return;
+          }
 
-      this.presensiList[existingPresensiIndex] = existingPresensi;
-    } else {
-      // Check-in must be provided for new entries
-      if (!presensiData.checkin) {
-        this.errorMssg = "Check-in must be provided for new entries.";
-      } else {
-        console.log(this.errorMssg);
-        this.errorMssg = " ";
-        // Add new entry
-        this.presensiList.push(presensiData);
-      }
-    }
+          if (result.length > 0) {
+            // Update the existing entry
+            const existingPresensi = result[0];
+
+            if (clockOut && existingPresensi.clock_in) {
+              const updateQuery =
+                "UPDATE attendances SET clock_out = ?, role = ? WHERE id = ?";
+
+              db.query(
+                updateQuery,
+                [clockOut, role, existingPresensi.id],
+                (err, result) => {
+                  db.end();
+
+                  if (err) {
+                    reject(err);
+                  } else {
+                    this.successMsg = "Clock-out updated successfully.";
+                    resolve(result);
+                  }
+                }
+              );
+            } else {
+              db.end();
+              reject("Clock-in must be present before clock-out can be added.");
+            }
+          } else {
+            // Insert new entry
+            if (!clockIn) {
+              db.end();
+              reject("Clock-in harus disediakan untuk entri baru.");
+            } else {
+              const insertQuery =
+                "INSERT INTO attendances (user_id, nama, clock_in, clock_out, role) VALUES (?, ?, ?, ?, ?)";
+
+              db.query(
+                insertQuery,
+                [userId, nama, clockIn, clockOut, role],
+                (err, result) => {
+                  db.end();
+
+                  if (err) {
+                    reject(err);
+                  } else {
+                    this.successMsg = "Entri baru berhasil ditambahkan.";
+                    resolve(result);
+                  }
+                }
+              );
+            }
+          }
+        });
+      });
+    });
+  }
+
+  getPageNumberForNewEntry(limit) {
+    const totalCount = this.countDocuments();
+    return Math.ceil(totalCount / limit);
   }
 }
 
