@@ -6,7 +6,7 @@ import { Server as socketIo } from "socket.io";
 import expressLayouts from "express-ejs-layouts";
 import morgan from "morgan";
 import presensiRoutes from "./routes/presensiRoutes.mjs";
-import portofolioRoutes from "./routes/portofolioRoutes.mjs";
+import reasonRoutes from "./routes/reasonRoutes.mjs";
 import errorRoutes from "./routes/errorRoutes.mjs";
 
 const app = express();
@@ -38,16 +38,23 @@ app.use(expressLayouts);
 
 // Routes
 app.use("/", presensiRoutes);
-app.use("/portofolio", portofolioRoutes);
+app.use("/reasons", reasonRoutes);
 
 // Middleware for handling 404 errors using custom error view
 app.use(errorRoutes);
 
 // Connect Socket.IO
 io.on("connection", (socket) => {
-  console.log("New client connected");
-  socket.on("disconnect", () => {
-    console.log("Client disconnected");
+  console.log(`socket:${socket.id} connected`);
+
+  // send an event to the client
+  socket.emit("foo", "bar");
+
+  socket.on("foobar", () => {
+    // an event was received from the client
+  });
+  socket.on("disconnect", (reason) => {
+    console.log(`socket:${socket.id} disconnected due to: ${reason}`);
   });
 });
 

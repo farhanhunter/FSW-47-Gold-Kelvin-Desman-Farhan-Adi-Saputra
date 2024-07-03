@@ -18,18 +18,16 @@
       <h1 class="text-3xl font-bold text-center mb-4">Presensi</h1>
 
       <!-- Notification Container -->
-      <% if (presensi.errorMssg != null && presensi.errorMssg.trim() !== "") {
-      %>
+      <% if (presensi.errorMsg) { %>
       <div
         class="bg-red-500 text-white text-center py-2 px-4 rounded mb-4 shadow-lg"
       >
-        <%= presensi.errorMssg %>
+        <%= presensi.errorMsg %>
       </div>
       <% } %>
 
       <!-- Success Message Container -->
-      <% if (presensi.successMsg != null && presensi.successMsg.trim() !== "") {
-      %>
+      <% if (presensi.successMsg) { %>
       <div
         class="bg-green-500 text-white text-center py-2 px-4 rounded mb-4 shadow-lg"
       >
@@ -62,11 +60,13 @@
             <td class="px-4 py-2">
               <%= (presensi.page - 1) * 5 + index + 1 %>
             </td>
-            <td class="px-4 py-2"><%= item.nama %></td>
+            <td class="px-4 py-2">
+              <%= item.User ? item.User.nama : 'User not found' %>
+            </td>
             <td class="px-4 py-2"><%= item.user_id %></td>
             <td class="px-4 py-2"><%= item.clock_in %></td>
             <td class="px-4 py-2"><%= item.clock_out %></td>
-            <td class="px-4 py-2"><%= item.role %></td>
+            <td class="px-4 py-2"><%= item.User ? item.User.role : 'N/A' %></td>
           </tr>
           <% }) %> <% } %>
         </tbody>
@@ -98,15 +98,6 @@
       >
         <div class="mb-4">
           <input
-            type="text"
-            name="nama"
-            placeholder="Nama"
-            required
-            class="w-full p-2 border rounded"
-          />
-        </div>
-        <div class="mb-4">
-          <input
             type="number"
             name="user_id"
             placeholder="User ID"
@@ -118,7 +109,7 @@
           <input
             type="text"
             id="checkin"
-            name="checkin"
+            name="clock_in"
             placeholder="Check-In"
             required
             class="w-full p-2 border rounded"
@@ -128,7 +119,7 @@
           <input
             type="text"
             id="checkout"
-            name="checkout"
+            name="clock_out"
             placeholder="Check-Out"
             class="w-full p-2 border rounded"
           />
@@ -136,9 +127,8 @@
         <div class="mb-4">
           <input
             type="text"
-            name="role"
-            placeholder="Role"
-            required
+            name="reason"
+            placeholder="Reason"
             class="w-full p-2 border rounded"
           />
         </div>

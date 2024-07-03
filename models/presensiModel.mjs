@@ -1,105 +1,30 @@
-import connection from "../config/database.js";
+import { Op } from "sequelize";
+import Attendance from "./attendanceModel.mjs";
+import User from "./userModel.mjs";
 
 class PresensiModel {
-  constructor() {
-    this.errorMssg = "";
-    this.successMsg = "";
-  }
-
   async getAllPresensi() {
-    const db = connection();
-
-    return new Promise((resolve, reject) => {
-      db.connect((err) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        const selectQuery = "SELECT * FROM attendances";
-        db.query(selectQuery, (err, results) => {
-          db.end();
-
-          if (err) {
-            reject(err);
-          } else {
-            resolve(results);
-          }
-        });
-      });
+    return await Attendance.findAll({
+      include: {
+        model: User,
+        attributes: ["nama", "role"],
+      },
     });
   }
 
   async getPaginatedPresensi(startIndex, limit) {
-    const db = connection();
-
-    return new Promise((resolve, reject) => {
-      db.connect((err) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        const selectQuery = "SELECT * FROM attendances LIMIT ?, ?";
-        db.query(selectQuery, [startIndex, limit], (err, results) => {
-          db.end();
-
-          if (err) {
-            reject(err);
-          } else {
-            resolve(results);
-          }
-        });
-      });
+    return await Attendance.findAll({
+      include: {
+        model: User,
+        attributes: ["nama", "role"],
+      },
+      limit: limit,
+      offset: startIndex,
     });
   }
 
   async countDocuments() {
-    const db = connection();
-
-    return new Promise((resolve, reject) => {
-      db.connect((err) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        const countQuery = "SELECT COUNT(*) AS count FROM attendances";
-        db.query(countQuery, (err, results) => {
-          db.end();
-
-          if (err) {
-            reject(err);
-          } else {
-            resolve(results[0].count);
-          }
-        });
-      });
-    });
-  }
-
-  async readPresensi() {
-    const db = connection();
-
-    return new Promise((resolve, reject) => {
-      db.connect((err) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        const selectQuery = "SELECT * FROM attendances";
-        db.query(selectQuery, (err, results) => {
-          db.end();
-
-          if (err) {
-            reject(err);
-          } else {
-            resolve(results);
-          }
-        });
-      });
-    });
+    return await Attendance.count();
   }
 
   formatName(name) {
@@ -118,88 +43,60 @@ class PresensiModel {
   }
 
   async insertOrUpdatePresensi(presensiData) {
-    const userId = presensiData.user_id;
-    const nama = this.capitalizeName(presensiData.nama); // Capitalize name
-    const clockIn = presensiData.checkin;
-    const clockOut = presensiData.checkout;
-    const role = presensiData.role;
+    const { user_id, clock_in, clock_out, reason } = presensiData;
 
-    const db = connection();
+    // Check if user_id exists in users table
+    const existingUser = await User.findByPk(user_id);
+    if (!existingUser) {
+      throw new Error("Id anda belum terdaftar di perusahaan ini.");
+    }
 
-    return new Promise((resolve, reject) => {
-      db.connect((err) => {
-        if (err) {
-          reject(err);
-          return;
-        }
+    if (!clock_in) {
+      throw new Error("Clock-in harus disediakan untuk entri baru.");
+    }
 
-        const selectQuery =
-          "SELECT * FROM attendances WHERE user_id = ? AND DATE(clock_in) = DATE(?)";
-        db.query(selectQuery, [userId, clockIn], (err, result) => {
-          if (err) {
-            db.end();
-            reject(err);
-            return;
-          }
+    if (!clock_out) {
+      throw new Error("Clock-out harus diisi.");
+    }
 
-          if (result.length > 0) {
-            // Update the existing entry
-            const existingPresensi = result[0];
+    // Validasi data datetime
+    if (isNaN(Date.parse(clock_out))) {
+      throw new Error("Format tanggal clock-out tidak valid.");
+    }
 
-            if (clockOut && existingPresensi.clock_in) {
-              const updateQuery =
-                "UPDATE attendances SET clock_out = ?, role = ? WHERE id = ?";
-
-              db.query(
-                updateQuery,
-                [clockOut, role, existingPresensi.id],
-                (err, result) => {
-                  db.end();
-
-                  if (err) {
-                    reject(err);
-                  } else {
-                    this.successMsg = "Clock-out updated successfully.";
-                    resolve(result);
-                  }
-                }
-              );
-            } else {
-              db.end();
-              reject("Clock-in must be present before clock-out can be added.");
-            }
-          } else {
-            // Insert new entry
-            if (!clockIn) {
-              db.end();
-              reject("Clock-in harus disediakan untuk entri baru.");
-            } else {
-              const insertQuery =
-                "INSERT INTO attendances (user_id, nama, clock_in, clock_out, role) VALUES (?, ?, ?, ?, ?)";
-
-              db.query(
-                insertQuery,
-                [userId, nama, clockIn, clockOut, role],
-                (err, result) => {
-                  db.end();
-
-                  if (err) {
-                    reject(err);
-                  } else {
-                    this.successMsg = "Entri baru berhasil ditambahkan.";
-                    resolve(result);
-                  }
-                }
-              );
-            }
-          }
-        });
-      });
+    const existingPresensi = await Attendance.findOne({
+      where: {
+        user_id: user_id,
+        clock_in: {
+          [Op.startsWith]: clock_in.split("T")[0],
+        },
+      },
     });
+
+    if (existingPresensi) {
+      existingPresensi.clock_out = clock_out;
+      existingPresensi.reason = reason;
+      await existingPresensi.save();
+      return {
+        successMsg: "Clock-out updated successfully.",
+        presensi: existingPresensi,
+      };
+    } else {
+      const newPresensi = await Attendance.create({
+        user_id: user_id,
+        clock_in: clock_in,
+        clock_out: clock_out,
+        reason: reason,
+      });
+      return {
+        successMsg: "Entri baru berhasil ditambahkan.",
+        presensi: newPresensi,
+      };
+    }
   }
 
-  getPageNumberForNewEntry(limit) {
-    const totalCount = this.countDocuments();
+  async getPageNumberForNewEntry(limit) {
+    const totalCount = await this.countDocuments();
     return Math.ceil(totalCount / limit);
   }
 }

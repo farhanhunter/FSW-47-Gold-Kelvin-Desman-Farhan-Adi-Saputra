@@ -6,7 +6,6 @@ class PresensiController {
       const page = parseInt(req.query.page) || 1;
       const limit = 5;
       const startIndex = (page - 1) * limit;
-      const endIndex = page * limit;
 
       const presensiList = await PresensiModel.getPaginatedPresensi(
         startIndex,
@@ -19,16 +18,10 @@ class PresensiController {
         page: page,
         totalCount: totalCount,
         previous: page > 1 ? { page: page - 1 } : null,
-        next: endIndex < totalCount ? { page: page + 1 } : null,
+        next: startIndex + limit < totalCount ? { page: page + 1 } : null,
+        errorMsg: "",
+        successMsg: "",
       };
-
-      if (PresensiModel.errorMssg != "") {
-        results.errorMssg = PresensiModel.errorMssg;
-        results.successMsg = "";
-      } else {
-        results.successMsg = PresensiModel.successMsg;
-        PresensiModel.successMsg = "";
-      }
 
       res.render("presensiView", { presensi: results });
     } catch (error) {
@@ -38,73 +31,82 @@ class PresensiController {
 
   async postPresensi(req, res, next) {
     try {
-      const { nama, user_id, checkin, checkout, role } = req.body;
+      const { user_id, clock_in, clock_out, reason } = req.body;
 
-      const newPresensi = {
-        nama,
-        user_id,
-        checkin,
-        checkout,
-        role,
-      };
-
-      // Validasi bahwa checkin tidak boleh kosong
-      if (!checkin) {
-        PresensiModel.errorMssg = "Clock-in harus diisi.";
-        const presensiList = await PresensiModel.getPaginatedPresensi(0, 5);
-        const totalCount = await PresensiModel.countDocuments();
-        const results = {
-          results: presensiList,
-          page: 1,
-          totalCount: totalCount,
-          errorMssg: PresensiModel.errorMssg,
-          successMsg: PresensiModel.successMsg,
-          previous: null,
-          next: 5 < totalCount ? { page: 2 } : null,
-        };
-        res.render("presensiView", { presensi: results });
-        return;
+      if (!clock_in) {
+        return this.renderPresensiViewWithError(res, "Clock-in harus diisi.");
       }
 
-      // Validasi bahwa checkout tidak boleh kosong jika checkin sudah ada
-      if (!checkout && checkin) {
-        PresensiModel.errorMssg = "Clock-out harus diisi.";
-        const presensiList = await PresensiModel.getPaginatedPresensi(0, 5);
-        const totalCount = await PresensiModel.countDocuments();
-        const results = {
-          results: presensiList,
-          page: 1,
-          totalCount: totalCount,
-          errorMssg: PresensiModel.errorMssg,
-          successMsg: PresensiModel.successMsg,
-          previous: null,
-          next: 5 < totalCount ? { page: 2 } : null,
-        };
-        res.render("presensiView", { presensi: results });
-        return;
+      if (!clock_out) {
+        return this.renderPresensiViewWithError(res, "Clock-out harus diisi.");
       }
 
-      await PresensiModel.insertOrUpdatePresensi(newPresensi);
+      const { successMsg, presensi } =
+        await PresensiModel.insertOrUpdatePresensi({
+          user_id,
+          clock_in,
+          clock_out,
+          reason,
+        });
 
-      const presensiList = await PresensiModel.getPaginatedPresensi(0, 5);
-      const totalCount = await PresensiModel.countDocuments();
+      this.renderPresensiViewWithSuccess(res, successMsg);
 
-      const results = {
-        results: presensiList,
-        page: 1,
-        totalCount: totalCount,
-        errorMssg: PresensiModel.errorMssg,
-        successMsg: PresensiModel.successMsg,
-        previous: null,
-        next: 5 < totalCount ? { page: 2 } : null,
-      };
-
-      req.app.get("io").emit("newPresensi", newPresensi);
-
-      res.render("presensiView", { presensi: results });
+      req.app.get("io").emit("newPresensi", presensi);
     } catch (error) {
-      next(error);
+      console.error("Error saat menyimpan presensi:", error);
+      let errorMsg = error.message;
+
+      // Handling specific error messages
+      if (
+        error.message.includes(
+          "foreign key constraint fails (`db_presensi`.`attendances`, CONSTRAINT `attendances_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)"
+        )
+      ) {
+        errorMsg = "Id anda belum terdaftar di perusahaan ini.";
+      } else if (
+        error.message.includes(
+          "Cannot add or update a child row: a foreign key constraint fails (`db_presensi`.`attendances`, CONSTRAINT `attendances_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON UPDATE CASCADE)"
+        )
+      ) {
+        errorMsg = "Id anda belum terdaftar di perusahaan ini.";
+      }
+
+      this.renderPresensiViewWithError(res, errorMsg);
     }
+  }
+
+  async renderPresensiViewWithError(res, errorMsg) {
+    const presensiList = await PresensiModel.getPaginatedPresensi(0, 5);
+    const totalCount = await PresensiModel.countDocuments();
+
+    const results = {
+      results: presensiList,
+      page: 1,
+      totalCount: totalCount,
+      errorMsg: errorMsg,
+      successMsg: "",
+      previous: null,
+      next: 5 < totalCount ? { page: 2 } : null,
+    };
+
+    res.render("presensiView", { presensi: results });
+  }
+
+  async renderPresensiViewWithSuccess(res, successMsg) {
+    const presensiList = await PresensiModel.getPaginatedPresensi(0, 5);
+    const totalCount = await PresensiModel.countDocuments();
+
+    const results = {
+      results: presensiList,
+      page: 1,
+      totalCount: totalCount,
+      errorMsg: "",
+      successMsg: successMsg,
+      previous: null,
+      next: 5 < totalCount ? { page: 2 } : null,
+    };
+
+    res.render("presensiView", { presensi: results });
   }
 }
 
