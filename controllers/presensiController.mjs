@@ -23,7 +23,11 @@ class PresensiController {
         successMsg: "",
       };
 
-      res.render("presensiView", { presensi: results });
+      res.render("presensiView", {
+        title: "Presensi",
+        h1: "Presensi",
+        presensi: results,
+      });
     } catch (error) {
       next(error);
     }
@@ -89,7 +93,11 @@ class PresensiController {
       next: 5 < totalCount ? { page: 2 } : null,
     };
 
-    res.render("presensiView", { presensi: results });
+    res.render("presensiView", {
+      title: "Presensi",
+      h1: "Presensi",
+      presensi: results,
+    });
   }
 
   async renderPresensiViewWithSuccess(res, successMsg) {
@@ -106,7 +114,11 @@ class PresensiController {
       next: 5 < totalCount ? { page: 2 } : null,
     };
 
-    res.render("presensiView", { presensi: results });
+    res.render("presensiView", {
+      title: "Presensi",
+      h1: "Presensi",
+      presensi: results,
+    });
   }
 }
 

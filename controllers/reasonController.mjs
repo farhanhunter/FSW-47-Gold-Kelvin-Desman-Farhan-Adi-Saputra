@@ -14,7 +14,11 @@ class ReasonController {
         reason.timeAgo = this.calculateTimeAgo(reason.clock_in);
       });
 
-      res.render("reason", { reasons });
+      res.render("reason", {
+        title: "Reason",
+        h1: "Reason",
+        reasons,
+      });
     } catch (error) {
       next(error);
     }
