@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= title %></title>
+    <title><%= typeof title !== 'undefined' ? title : 'Default Title' %></title>
     <link href="/css/app.css" rel="stylesheet" />
     <script src="/node_modules/socket.io/client-dist/socket.io.js"></script>
     <link

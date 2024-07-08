@@ -34,7 +34,7 @@ const Attendance = sequelize.define(
   {
     tableName: "attendances",
     timestamps: false,
-  }
+  },
 );
 
 Attendance.belongsTo(User, { foreignKey: "user_id" });

@@ -60,18 +60,7 @@ class PresensiController {
       console.error("Error saat menyimpan presensi:", error);
       let errorMsg = error.message;
 
-      // Handling specific error messages
-      if (
-        error.message.includes(
-          "foreign key constraint fails (`db_presensi`.`attendances`, CONSTRAINT `attendances_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)"
-        )
-      ) {
-        errorMsg = "Id anda belum terdaftar di perusahaan ini.";
-      } else if (
-        error.message.includes(
-          "Cannot add or update a child row: a foreign key constraint fails (`db_presensi`.`attendances`, CONSTRAINT `attendances_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON UPDATE CASCADE)"
-        )
-      ) {
+      if (error.message.includes("foreign key constraint fails")) {
         errorMsg = "Id anda belum terdaftar di perusahaan ini.";
       }
 
@@ -80,18 +69,7 @@ class PresensiController {
   }
 
   async renderPresensiViewWithError(res, errorMsg) {
-    const presensiList = await PresensiModel.getPaginatedPresensi(0, 5);
-    const totalCount = await PresensiModel.countDocuments();
-
-    const results = {
-      results: presensiList,
-      page: 1,
-      totalCount: totalCount,
-      errorMsg: errorMsg,
-      successMsg: "",
-      previous: null,
-      next: 5 < totalCount ? { page: 2 } : null,
-    };
+    const results = await this.getPresensiResults(1, 5, errorMsg, "");
 
     res.render("presensiView", {
       title: "Presensi",
@@ -101,24 +79,32 @@ class PresensiController {
   }
 
   async renderPresensiViewWithSuccess(res, successMsg) {
-    const presensiList = await PresensiModel.getPaginatedPresensi(0, 5);
-    const totalCount = await PresensiModel.countDocuments();
-
-    const results = {
-      results: presensiList,
-      page: 1,
-      totalCount: totalCount,
-      errorMsg: "",
-      successMsg: successMsg,
-      previous: null,
-      next: 5 < totalCount ? { page: 2 } : null,
-    };
+    const results = await this.getPresensiResults(1, 5, "", successMsg);
 
     res.render("presensiView", {
       title: "Presensi",
       h1: "Presensi",
       presensi: results,
     });
+  }
+
+  async getPresensiResults(page, limit, errorMsg = "", successMsg = "") {
+    const startIndex = (page - 1) * limit;
+    const presensiList = await PresensiModel.getPaginatedPresensi(
+      startIndex,
+      limit
+    );
+    const totalCount = await PresensiModel.countDocuments();
+
+    return {
+      results: presensiList,
+      page: page,
+      totalCount: totalCount,
+      previous: page > 1 ? { page: page - 1 } : null,
+      next: startIndex + limit < totalCount ? { page: page + 1 } : null,
+      errorMsg: errorMsg,
+      successMsg: successMsg,
+    };
   }
 }
 

@@ -30,7 +30,7 @@ app.set("views", path.join(process.cwd(), "views"));
 app.use(express.static(path.join(process.cwd(), "public")));
 app.use(
   "/node_modules",
-  express.static(path.join(process.cwd(), "node_modules"))
+  express.static(path.join(process.cwd(), "node_modules")),
 );
 
 // Use express-ejs-layouts

@@ -5,23 +5,25 @@ class ReasonController {
     try {
       const reasons = await ReasonModel.getAll();
 
-      reasons.forEach((reason) => {
-        reason.shortReason = reason.reason.slice(0, 20); // Ambil 20 karakter pertama dari reason
-        reason.duration = this.calculateDuration(
-          reason.clock_in,
-          reason.clock_out
-        );
-        reason.timeAgo = this.calculateTimeAgo(reason.clock_in);
-      });
+      const formattedReasons = reasons.map((reason) => ({
+        ...reason,
+        shortReason: this.getShortReason(reason.reason),
+        duration: this.calculateDuration(reason.clock_in, reason.clock_out),
+        timeAgo: this.calculateTimeAgo(reason.clock_in),
+      }));
 
       res.render("reason", {
         title: "Reason",
         h1: "Reason",
-        reasons,
+        reasons: formattedReasons,
       });
     } catch (error) {
       next(error);
     }
+  }
+
+  getShortReason(reason) {
+    return reason.slice(0, 20); // Ambil 20 karakter pertama dari reason
   }
 
   calculateDuration(clock_in, clock_out) {
