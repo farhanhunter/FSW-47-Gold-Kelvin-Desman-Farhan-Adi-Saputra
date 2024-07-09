@@ -16,6 +16,7 @@ class ReasonController {
         title: "Reason",
         h1: "Reason",
         reasons: formattedReasons,
+        activePage: "reasons",
       });
     } catch (error) {
       next(error);

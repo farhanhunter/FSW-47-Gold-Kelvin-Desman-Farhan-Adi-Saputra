@@ -27,6 +27,7 @@ class PresensiController {
         title: "Presensi",
         h1: "Presensi",
         presensi: results,
+        activePage: "home",
       });
     } catch (error) {
       next(error);
@@ -75,6 +76,7 @@ class PresensiController {
       title: "Presensi",
       h1: "Presensi",
       presensi: results,
+      activePage: "home",
     });
   }
 
@@ -85,6 +87,7 @@ class PresensiController {
       title: "Presensi",
       h1: "Presensi",
       presensi: results,
+      activePage: "home",
     });
   }
 
