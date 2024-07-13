@@ -7,15 +7,13 @@
           <div class="ml-10 flex items-baseline space-x-4">
             <a
               href="/"
-              class="<%= activePage === 'home' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' %> rounded-md px-3 py-2 text-sm font-medium"
+              class="<%= activePage === 'Home' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' %> rounded-md px-3 py-2 text-sm font-medium"
               aria-current="page"
-              >Home</a
-            >
+              >Home</a>
             <a
               href="/reasons"
               class="<%= activePage === 'reasons' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' %> rounded-md px-3 py-2 text-sm font-medium"
-              >Reasons</a
-            >
+              >Reasons</a>
           </div>
         </div>
       </div>
@@ -150,17 +148,8 @@
   <!-- Mobile menu, show/hide based on menu state. -->
   <div x-show="isOpen" class="md:hidden w-full" id="mobile-menu">
     <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-      <a
-        href="/"
-        class="<%= activePage === 'home' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' %> block rounded-md px-3 py-2 text-base font-medium"
-        aria-current="page"
-        >Home</a
-      >
-      <a
-        href="/reasons"
-        class="<%= activePage === 'reasons' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' %> block rounded-md px-3 py-2 text-base font-medium"
-        >Reasons</a
-      >
+      <a href="/" class="block rounded-md px-3 py-2 text-base font-medium" :class="{ 'bg-gray-900 text-white': activePage === 'Home', 'text-gray-300 hover:bg-gray-700 hover:text-white': activePage !== 'Home' }" aria-current="page">Home</a>
+      <a href="/reasons" class="block rounded-md px-3 py-2 text-base font-medium" :class="{ 'bg-gray-900 text-white': activePage === 'reasons', 'text-gray-300 hover:bg-gray-700 hover:text-white': activePage !== 'reasons' }">Reasons</a>
     </div>
     <div class="border-t border-gray-700 pb-3 pt-4">
       <div class="flex items-center px-5">

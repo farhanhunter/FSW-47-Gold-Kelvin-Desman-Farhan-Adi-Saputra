@@ -55,37 +55,32 @@ class PresensiModel {
       throw new Error("Clock-in harus disediakan untuk entri baru.");
     }
 
-    if (!clock_out) {
-      throw new Error("Clock-out harus diisi.");
-    }
-
-    // Validasi data datetime
-    if (isNaN(Date.parse(clock_out))) {
+    // Validasi data datetime untuk clock_out jika diisi
+    if (clock_out && isNaN(Date.parse(clock_out))) {
       throw new Error("Format tanggal clock-out tidak valid.");
     }
 
+    // Mencari entri dengan user_id dan clock_in yang sama
     const existingPresensi = await Attendance.findOne({
       where: {
         user_id: user_id,
-        clock_in: {
-          [Op.startsWith]: clock_in.split("T")[0],
-        },
+        clock_in: clock_in,
       },
     });
 
     if (existingPresensi) {
-      existingPresensi.clock_out = clock_out;
-      existingPresensi.reason = reason;
+      if (clock_out) existingPresensi.clock_out = clock_out;
+      if (reason) existingPresensi.reason = reason;
       await existingPresensi.save();
       return {
-        successMsg: "Clock-out updated successfully.",
+        successMsg: "Presensi berhasil diperbarui.",
         presensi: existingPresensi,
       };
     } else {
       const newPresensi = await Attendance.create({
         user_id: user_id,
         clock_in: clock_in,
-        clock_out: clock_out,
+        clock_out: clock_out || null,
         reason: reason,
       });
       return {

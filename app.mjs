@@ -2,7 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import path from "path";
 import http from "http";
-import { Server as socketIo } from "socket.io";
+import { Server as SocketIo } from "socket.io";
 import expressLayouts from "express-ejs-layouts";
 import morgan from "morgan";
 import presensiRoutes from "./routes/presensiRoutes.mjs";
@@ -11,7 +11,7 @@ import errorRoutes from "./routes/errorRoutes.mjs";
 
 const app = express();
 const server = http.createServer(app);
-const io = new socketIo(server);
+const io = new SocketIo(server); // Gunakan SocketIo
 const port = 3001;
 
 // Use Morgan for logging HTTP requests
@@ -30,7 +30,7 @@ app.set("views", path.join(process.cwd(), "views"));
 app.use(express.static(path.join(process.cwd(), "public")));
 app.use(
   "/node_modules",
-  express.static(path.join(process.cwd(), "node_modules")),
+  express.static(path.join(process.cwd(), "node_modules"))
 );
 
 // Use express-ejs-layouts

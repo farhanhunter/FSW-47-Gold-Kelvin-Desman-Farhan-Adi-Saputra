@@ -16,7 +16,7 @@ class ReasonController {
         title: "Reason",
         h1: "Reason",
         reasons: formattedReasons,
-        activePage: "reasons",
+        activePage: "reasons", // Ensure `activePage` is set
       });
     } catch (error) {
       next(error);

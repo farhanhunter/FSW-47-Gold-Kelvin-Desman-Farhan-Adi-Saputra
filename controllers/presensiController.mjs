@@ -27,7 +27,7 @@ class PresensiController {
         title: "Presensi",
         h1: "Presensi",
         presensi: results,
-        activePage: "home",
+        activePage: "Home", // Ensure `activePage` is set
       });
     } catch (error) {
       next(error);
@@ -40,10 +40,6 @@ class PresensiController {
 
       if (!clock_in) {
         return this.renderPresensiViewWithError(res, "Clock-in harus diisi.");
-      }
-
-      if (!clock_out) {
-        return this.renderPresensiViewWithError(res, "Clock-out harus diisi.");
       }
 
       const { successMsg, presensi } =
@@ -76,7 +72,7 @@ class PresensiController {
       title: "Presensi",
       h1: "Presensi",
       presensi: results,
-      activePage: "home",
+      activePage: "Home", // Ensure `activePage` is set
     });
   }
 
@@ -87,7 +83,7 @@ class PresensiController {
       title: "Presensi",
       h1: "Presensi",
       presensi: results,
-      activePage: "home",
+      activePage: "Home", // Ensure `activePage` is set
     });
   }
 

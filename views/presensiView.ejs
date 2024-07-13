@@ -2,121 +2,80 @@
 <!-- Konten utama tanpa header dan footer -->
 <!-- Notification Container -->
 <% if (presensi.errorMsg) { %>
-<div class="bg-red-500 text-white text-center py-2 px-4 rounded mb-4 shadow-lg">
-  <%= presensi.errorMsg %>
-</div>
-<% } %>
-
-<!-- Success Message Container -->
-<% if (presensi.successMsg) { %>
-<div
-  class="bg-green-500 text-white text-center py-2 px-4 rounded mb-4 shadow-lg"
->
-  <%= presensi.successMsg %>
-</div>
-<% } %>
-
-<table
-  id="presensiTable"
-  class="w-full table-auto bg-white shadow-md rounded-lg"
->
-  <thead>
-    <tr class="bg-gray-200 text-left">
-      <th class="px-4 py-2">Nomor</th>
-      <th class="px-4 py-2">Nama</th>
-      <th class="px-4 py-2">User ID</th>
-      <th class="px-4 py-2">Check-In</th>
-      <th class="px-4 py-2">Check-Out</th>
-      <th class="px-4 py-2">Role</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% if (presensi.results.length === 0) { %>
-    <tr class="border-b">
-      <td colspan="6" class="px-4 py-2 text-center">Tidak ada data</td>
-    </tr>
-    <% } %> <% if (presensi.results.length > 0) { %> <%
-    presensi.results.forEach((item, index) => { %>
-    <tr class="border-b">
-      <td class="px-4 py-2"><%= (presensi.page - 1) * 5 + index + 1 %></td>
-      <td class="px-4 py-2">
-        <%= item.User ? item.User.nama : 'User not found' %>
-      </td>
-      <td class="px-4 py-2"><%= item.user_id %></td>
-      <td class="px-4 py-2"><%= item.clock_in %></td>
-      <td class="px-4 py-2"><%= item.clock_out %></td>
-      <td class="px-4 py-2"><%= item.User ? item.User.role : 'N/A' %></td>
-    </tr>
-    <% }) %> <% } %>
-  </tbody>
-</table>
-
-<!-- Pagination Controls -->
-<div class="pagination flex justify-center mt-4">
-  <% if (presensi.previous) { %>
-  <a
-    href="/?page=<%= presensi.previous.page %>"
-    class="px-4 py-2 bg-blue-600 text-gray-100 rounded hover:bg-blue-800"
-  >
-    Previous
-  </a>
+  <div class="bg-red-500 text-white text-center py-2 px-4 rounded mb-4 shadow-lg">
+    <%= presensi.errorMsg %>
+  </div>
   <% } %>
-  <span class="px-4 py-2">Page <%= presensi.page %></span>
-  <% if (presensi.next) { %>
-  <a
-    href="/?page=<%= presensi.next.page %>"
-    class="px-4 py-2 bg-blue-600 text-gray-100 rounded hover:bg-blue-800"
-  >
-    Next
-  </a>
+  
+  <!-- Success Message Container -->
+  <% if (presensi.successMsg) { %>
+  <div class="bg-green-500 text-white text-center py-2 px-4 rounded mb-4 shadow-lg">
+    <%= presensi.successMsg %>
+  </div>
   <% } %>
-</div>
-
-<form
-  action="/submit-presensi"
-  method="POST"
-  class="mt-4 bg-white p-4 shadow-md rounded-lg"
->
-  <div class="mb-4">
-    <input
-      type="number"
-      name="user_id"
-      placeholder="User ID"
-      required
-      class="w-full p-2 border rounded"
-    />
+  
+  <table id="presensiTable" class="w-full table-auto bg-white shadow-md rounded-lg">
+    <thead>
+      <tr class="bg-gray-200 text-left">
+        <th class="px-4 py-2">Nomor</th>
+        <th class="px-4 py-2">Nama</th>
+        <th class="px-4 py-2">User ID</th>
+        <th class="px-4 py-2">Check-In</th>
+        <th class="px-4 py-2">Check-Out</th>
+        <th class="px-4 py-2">Role</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (presensi.results.length === 0) { %>
+      <tr class="border-b">
+        <td colspan="6" class="px-4 py-2 text-center">Tidak ada data</td>
+      </tr>
+      <% } %> <% if (presensi.results.length > 0) { %> <%
+      presensi.results.forEach((item, index) => { %>
+      <tr class="border-b">
+        <td class="px-4 py-2"><%= (presensi.page - 1) * 5 + index + 1 %></td>
+        <td class="px-4 py-2">
+          <%= item.User ? item.User.nama : 'User not found' %>
+        </td>
+        <td class="px-4 py-2"><%= item.user_id %></td>
+        <td class="px-4 py-2"><%= item.clock_in %></td>
+        <td class="px-4 py-2"><%= item.clock_out %></td>
+        <td class="px-4 py-2"><%= item.User ? item.User.role : 'N/A' %></td>
+      </tr>
+      <% }) %> <% } %>
+    </tbody>
+  </table>
+  
+  <!-- Pagination Controls -->
+  <div class="pagination flex justify-center mt-4">
+    <% if (presensi.previous) { %>
+    <a href="/?page=<%= presensi.previous.page %>" class="px-4 py-2 bg-blue-600 text-gray-100 rounded hover:bg-blue-800">
+      Previous
+    </a>
+    <% } %>
+    <span class="px-4 py-2">Page <%= presensi.page %></span>
+    <% if (presensi.next) { %>
+    <a href="/?page=<%= presensi.next.page %>" class="px-4 py-2 bg-blue-600 text-gray-100 rounded hover:bg-blue-800">
+      Next
+    </a>
+    <% } %>
   </div>
-  <div class="mb-4">
-    <input
-      type="text"
-      id="checkin"
-      name="clock_in"
-      placeholder="Check-In"
-      required
-      class="w-full p-2 border rounded"
-    />
-  </div>
-  <div class="mb-4">
-    <input
-      type="text"
-      id="checkout"
-      name="clock_out"
-      placeholder="Check-Out"
-      class="w-full p-2 border rounded"
-    />
-  </div>
-  <div class="mb-4">
-    <input
-      type="text"
-      name="reason"
-      placeholder="Reason"
-      class="w-full p-2 border rounded"
-    />
-  </div>
-  <button
-    type="submit"
-    class="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-700"
-  >
-    Tambah Presensi
-  </button>
-</form>
+  
+  <form action="/submit-presensi" method="POST" class="mt-4 bg-white p-4 shadow-md rounded-lg">
+    <div class="mb-4">
+      <input type="number" name="user_id" placeholder="User ID" required class="w-full p-2 border rounded" />
+    </div>
+    <div class="mb-4">
+      <input type="datetime-local" id="checkin" name="clock_in" placeholder="Check-In" required class="w-full p-2 border rounded" />
+    </div>
+    <div class="mb-4">
+      <input type="datetime-local" id="checkout" name="clock_out" placeholder="Check-Out" class="w-full p-2 border rounded" />
+    </div>
+    <div class="mb-4">
+      <input type="text" name="reason" placeholder="Reason" class="w-full p-2 border rounded" />
+    </div>
+    <button type="submit" class="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-700">
+      Tambah Presensi
+    </button>
+  </form>
+  

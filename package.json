@@ -9,8 +9,8 @@
     "dev": "nodemon app.mjs",
     "start": "node app.mjs",
     "sync": "nodemon sinkronisasi.mjs",
-    "lint": "eslint \"**/*.{js,mjs}\"",
-    "lint:fix": "eslint --fix && prettier --write \"**/*.{js,mjs}\"",
+    "lint": "eslint \"**/*.{js,mjs,ejs}\"",
+    "lint:fix": "eslint --fix && prettier --write \"**/*.{js,mjs,ejs}\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
