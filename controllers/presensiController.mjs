@@ -1,3 +1,4 @@
+// presensiController.mjs
 import PresensiModel from "../models/presensiModel.mjs";
 
 class PresensiController {
@@ -27,7 +28,7 @@ class PresensiController {
         title: "Presensi",
         h1: "Presensi",
         presensi: results,
-        activePage: "Home", // Ensure `activePage` is set
+        activePage: "Home",
       });
     } catch (error) {
       next(error);
@@ -65,6 +66,31 @@ class PresensiController {
     }
   }
 
+  async updatePresensi(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { clock_out, reason } = req.body;
+
+      const attendance = await PresensiModel.findById(id);
+
+      if (!attendance) {
+        return this.renderPresensiViewWithError(
+          res,
+          "Presensi tidak ditemukan."
+        );
+      }
+
+      if (clock_out) attendance.clock_out = clock_out;
+      if (reason) attendance.reason = reason;
+
+      await attendance.save();
+
+      this.renderPresensiViewWithSuccess(res, "Presensi berhasil diperbarui.");
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async renderPresensiViewWithError(res, errorMsg) {
     const results = await this.getPresensiResults(1, 5, errorMsg, "");
 
@@ -72,7 +98,7 @@ class PresensiController {
       title: "Presensi",
       h1: "Presensi",
       presensi: results,
-      activePage: "Home", // Ensure `activePage` is set
+      activePage: "Home",
     });
   }
 
@@ -83,7 +109,7 @@ class PresensiController {
       title: "Presensi",
       h1: "Presensi",
       presensi: results,
-      activePage: "Home", // Ensure `activePage` is set
+      activePage: "Home",
     });
   }
 

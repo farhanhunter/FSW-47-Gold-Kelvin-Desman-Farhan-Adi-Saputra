@@ -4,12 +4,14 @@ import presensiController from "../controllers/presensiController.mjs";
 
 const router = express.Router();
 
-router.get("/", (req, res, next) => {
-  presensiController.getPresensi(req, res, next);
-});
-
-router.post("/submit-presensi", (req, res, next) => {
-  presensiController.postPresensi(req, res, next);
-});
+router.get("/", presensiController.getPresensi.bind(presensiController));
+router.post(
+  "/submit-presensi",
+  presensiController.postPresensi.bind(presensiController)
+);
+router.put(
+  "/update-presensi/:id",
+  presensiController.updatePresensi.bind(presensiController)
+);
 
 export default router;

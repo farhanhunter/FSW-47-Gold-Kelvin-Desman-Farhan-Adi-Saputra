@@ -42,6 +42,15 @@ class PresensiModel {
       .join(" ");
   }
 
+  async findById(id) {
+    return await Attendance.findByPk(id, {
+      include: {
+        model: User,
+        attributes: ["nama", "role"],
+      },
+    });
+  }
+
   async insertOrUpdatePresensi(presensiData) {
     const { user_id, clock_in, clock_out, reason } = presensiData;
 

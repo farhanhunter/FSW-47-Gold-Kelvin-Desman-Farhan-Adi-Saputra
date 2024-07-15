@@ -46,4 +46,34 @@ document.addEventListener("DOMContentLoaded", function () {
     dateFormat: "Y-m-d H:i:S",
     time_24hr: true,
   });
+
+  // Add submitUpdateForm function
+  window.submitUpdateForm = function (event, form) {
+    event.preventDefault();
+    const id = form.querySelector('input[name="id"]').value;
+    const formData = new FormData(form);
+    const data = {};
+    formData.forEach((value, key) => {
+      data[key] = value;
+    });
+
+    fetch(`/update-presensi/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => {
+        if (response.ok) {
+          window.location.reload();
+        } else {
+          alert("Error updating presensi");
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        alert("Error updating presensi");
+      });
+  };
 });
