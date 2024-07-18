@@ -70,8 +70,10 @@ class PresensiController {
     try {
       const { id } = req.params;
       const { clock_out, reason } = req.body;
+      console.log("Data yang diterima dari form:", req.body);
 
       const attendance = await PresensiModel.findById(id);
+      console.log("Data yang ditemukan:", attendance);
 
       if (!attendance) {
         return this.renderPresensiViewWithError(

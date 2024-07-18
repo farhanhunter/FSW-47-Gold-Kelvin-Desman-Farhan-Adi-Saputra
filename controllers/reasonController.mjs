@@ -19,7 +19,7 @@ class ReasonController {
         const userRole = reason.User ? reason.User.role : "Unknown role";
 
         return {
-          ...reason,
+          ...reason.dataValues, // Pastikan kita menggunakan dataValues untuk mendapatkan properti dari sequelize instance
           shortReason,
           duration,
           timeAgo,

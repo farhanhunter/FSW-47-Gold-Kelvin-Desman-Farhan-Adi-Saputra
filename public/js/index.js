@@ -6,9 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
       parseInt(document.getElementById("page-number").value) || 1;
     const limit = 5;
 
-    // Check if the new presensi is on the current page
     if (data.page === currentPage) {
-      // Fetch the updated data for the current page
       fetch(`/?page=${currentPage}`)
         .then((response) => response.text())
         .then((data) => {
@@ -21,13 +19,9 @@ document.addEventListener("DOMContentLoaded", function () {
             .getElementById("presensiTable")
             .getElementsByTagName("tbody")[0];
 
-          // Replace the current table body with the new one
           currentTableBody.innerHTML = newTableBody.innerHTML;
-
-          // Update the pagination controls
           const newPageNumber = doc.getElementById("page-number").value;
           document.getElementById("page-number").value = newPageNumber;
-
           const paginationControls = doc.querySelector(".pagination");
           document.querySelector(".pagination").innerHTML =
             paginationControls.innerHTML;
@@ -47,7 +41,6 @@ document.addEventListener("DOMContentLoaded", function () {
     time_24hr: true,
   });
 
-  // Add submitUpdateForm function
   window.submitUpdateForm = function (event, form) {
     event.preventDefault();
     const id = form.querySelector('input[name="id"]').value;

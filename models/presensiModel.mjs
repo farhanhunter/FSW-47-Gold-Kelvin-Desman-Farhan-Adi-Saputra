@@ -41,7 +41,6 @@ class PresensiModel {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
   }
-
   async findById(id) {
     return await Attendance.findByPk(id, {
       include: {
@@ -53,23 +52,13 @@ class PresensiModel {
 
   async insertOrUpdatePresensi(presensiData) {
     const { user_id, clock_in, clock_out, reason } = presensiData;
-
-    // Check if user_id exists in users table
+    console.log("Data yang diterima untuk pembaruan:", presensiData);
     const existingUser = await User.findByPk(user_id);
+
     if (!existingUser) {
       throw new Error("Id anda belum terdaftar di perusahaan ini.");
     }
 
-    if (!clock_in) {
-      throw new Error("Clock-in harus disediakan untuk entri baru.");
-    }
-
-    // Validasi data datetime untuk clock_out jika diisi
-    if (clock_out && isNaN(Date.parse(clock_out))) {
-      throw new Error("Format tanggal clock-out tidak valid.");
-    }
-
-    // Mencari entri dengan user_id dan clock_in yang sama
     const existingPresensi = await Attendance.findOne({
       where: {
         user_id: user_id,

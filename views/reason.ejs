@@ -1,5 +1,3 @@
-<!-- reason.ejs -->
-<!-- Konten utama tanpa header dan footer -->
 <main class="container mx-auto px-4 py-6">
   <% reasons.forEach(reason => { %>
   <article class="mb-8 border-b pb-8">
@@ -8,38 +6,24 @@
     </h2>
     <div class="flex items-center text-base text-slate-500 mb-4">
       <p class="mr-1">By</p>
-      <a href="#" class="mr-2 text-sky-500 hover:text-sky-700 hover:underline"
-        ><%= reason.User.nama %></a
-      >
+      <a href="#" class="mr-2 text-sky-500 hover:text-sky-700 hover:underline"><%= reason.User.nama %></a>
       <p class="mr-1">In</p>
-      <a href="#" class="mr-2 text-sky-500 hover:text-sky-700 hover:underline"
-        ><%= reason.User.role %></a
-      >
+      <a href="#" class="mr-2 text-sky-500 hover:text-sky-700 hover:underline"><%= reason.User.role %></a>
       | <%= reason.timeAgo %>
     </div>
     <div class="border-t border-gray-200">
       <dl>
-        <div
-          class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-        >
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-500">Reason</dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-            <%= reason.reason %>
-          </dd>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= reason.reason %></dd>
         </div>
         <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-500">Duration</dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-            <%= reason.duration %>
-          </dd>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= reason.duration %></dd>
         </div>
-        <div
-          class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-        >
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-500">Name</dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-            <%= reason.User.nama %>
-          </dd>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= reason.User.nama %></dd>
         </div>
       </dl>
     </div>
