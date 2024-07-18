@@ -93,6 +93,21 @@ class PresensiController {
     }
   }
 
+  async deletePresensi(req, res, next) {
+    try {
+      const { id } = req.params;
+      console.log("Menghapus presensi dengan ID:", id);
+
+      const result = await PresensiModel.deleteById(id);
+      console.log("Hasil penghapusan:", result);
+
+      this.renderPresensiViewWithSuccess(res, result.successMsg);
+    } catch (error) {
+      console.error("Error saat menghapus presensi:", error);
+      this.renderPresensiViewWithError(res, error.message);
+    }
+  }
+
   async renderPresensiViewWithError(res, errorMsg) {
     const results = await this.getPresensiResults(1, 5, errorMsg, "");
 

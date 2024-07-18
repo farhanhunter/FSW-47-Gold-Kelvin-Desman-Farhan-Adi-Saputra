@@ -1,3 +1,4 @@
+// app.mjs
 import express from "express";
 import bodyParser from "body-parser";
 import path from "path";
@@ -5,13 +6,14 @@ import http from "http";
 import { Server as SocketIo } from "socket.io";
 import expressLayouts from "express-ejs-layouts";
 import morgan from "morgan";
+import methodOverride from "method-override";
 import presensiRoutes from "./routes/presensiRoutes.mjs";
 import reasonRoutes from "./routes/reasonRoutes.mjs";
 import errorRoutes from "./routes/errorRoutes.mjs";
 
 const app = express();
 const server = http.createServer(app);
-const io = new SocketIo(server); // Gunakan SocketIo
+const io = new SocketIo(server);
 const port = 3001;
 
 // Use Morgan for logging HTTP requests
@@ -37,6 +39,7 @@ app.use(
 app.use(expressLayouts);
 
 // Routes
+app.use(methodOverride("_method"));
 app.use("/", presensiRoutes);
 app.use("/reasons", reasonRoutes);
 

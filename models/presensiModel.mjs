@@ -41,6 +41,7 @@ class PresensiModel {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
   }
+
   async findById(id) {
     return await Attendance.findByPk(id, {
       include: {
@@ -48,6 +49,22 @@ class PresensiModel {
         attributes: ["nama", "role"],
       },
     });
+  }
+
+  async deleteById(id) {
+    const result = await Attendance.destroy({
+      where: {
+        id: id,
+      },
+    });
+
+    if (result === 0) {
+      throw new Error("Presensi tidak ditemukan.");
+    }
+
+    return {
+      successMsg: "Presensi berhasil dihapus.",
+    };
   }
 
   async insertOrUpdatePresensi(presensiData) {

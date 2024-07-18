@@ -1,4 +1,28 @@
 document.addEventListener("DOMContentLoaded", function () {
+  // Event listener untuk delete
+  document.querySelectorAll(".delete-button").forEach((button) => {
+    button.addEventListener("click", function (event) {
+      event.preventDefault();
+      const id = this.dataset.id;
+
+      if (confirm("Are you sure you want to delete this entry?")) {
+        fetch(`/delete-presensi/${id}`, {
+          method: "DELETE",
+        })
+          .then((response) => {
+            if (response.ok) {
+              window.location.reload();
+            } else {
+              alert("Error deleting presensi");
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("Error deleting presensi");
+          });
+      }
+    });
+  });
   const socket = io();
 
   socket.on("newPresensi", (data) => {

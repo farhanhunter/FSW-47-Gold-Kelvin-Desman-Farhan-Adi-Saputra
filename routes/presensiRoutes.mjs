@@ -13,5 +13,9 @@ router.put(
   "/update-presensi/:id",
   presensiController.updatePresensi.bind(presensiController)
 );
+router.delete(
+  "/delete-presensi/:id",
+  presensiController.deletePresensi.bind(presensiController)
+);
 
 export default router;
