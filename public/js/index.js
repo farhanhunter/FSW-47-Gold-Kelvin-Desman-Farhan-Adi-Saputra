@@ -1,19 +1,16 @@
-// index.js
 document.addEventListener("DOMContentLoaded", function () {
-  // Tampilkan pesan sukses jika ada
   const successMsg = document.getElementById("success-msg");
   if (successMsg) {
     alert(successMsg.textContent);
   }
 
-  // Event listener untuk delete
   document.querySelectorAll(".delete-button").forEach((button) => {
     button.addEventListener("click", function (event) {
       event.preventDefault();
       const id = this.dataset.id;
 
       if (confirm("Are you sure you want to delete this entry?")) {
-        fetch(`/delete-presensi/${id}`, {
+        fetch(`/presensi/delete-presensi/${id}`, {
           method: "DELETE",
         })
           .then((response) => {
@@ -31,19 +28,17 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // Event listener untuk update
   window.submitUpdateForm = function (event, form) {
     event.preventDefault();
     const id = form.querySelector('input[name="id"]').value;
-    const page = form.querySelector('input[name="page"]').value; // Get page value
+    const page = form.querySelector('input[name="page"]').value;
     const formData = new FormData(form);
     const data = {};
     formData.forEach((value, key) => {
       data[key] = value;
     });
 
-    fetch(`/update-presensi/${id}?page=${page}`, {
-      // Include page parameter in URL
+    fetch(`/presensi/update-presensi/${id}?page=${page}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -63,7 +58,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   };
 
-  // WebSocket untuk update real-time
   const socket = io();
   socket.on("newPresensi", (data) => {
     const currentPage =
@@ -71,7 +65,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const limit = 5;
 
     if (data.page === currentPage) {
-      fetch(`/?page=${currentPage}`)
+      fetch(`/presensi?page=${currentPage}`)
         .then((response) => response.text())
         .then((data) => {
           const parser = new DOMParser();

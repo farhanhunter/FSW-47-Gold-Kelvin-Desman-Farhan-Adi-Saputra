@@ -14,8 +14,8 @@ const Attendance = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: User, // Tabel yang direferensikan adalah model 'User'
-        key: "user_id",
+        model: User,
+        key: "id",
       },
     },
     clock_in: {
@@ -34,7 +34,7 @@ const Attendance = sequelize.define(
   {
     tableName: "attendances",
     timestamps: false,
-  },
+  }
 );
 
 Attendance.belongsTo(User, { foreignKey: "user_id" });

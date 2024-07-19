@@ -1,4 +1,3 @@
-// presensiController.mjs
 import PresensiModel from "../models/presensiModel.mjs";
 
 class PresensiController {
@@ -20,17 +19,22 @@ class PresensiController {
         totalCount: totalCount,
         previous: page > 1 ? { page: page - 1 } : null,
         next: startIndex + limit < totalCount ? { page: page + 1 } : null,
-        errorMsg: "",
-        successMsg: "",
+        errorMsg: req.session.errorMsg || "",
+        successMsg: req.session.successMsg || "",
       };
+
+      // Clear the session messages after they've been used
+      req.session.errorMsg = "";
+      req.session.successMsg = "";
 
       res.render("presensiView", {
         title: "Presensi",
         h1: "Presensi",
         presensi: results,
-        activePage: "Home",
+        activePage: "presensi",
       });
     } catch (error) {
+      console.error("Error getting presensi:", error);
       next(error);
     }
   }
@@ -76,7 +80,7 @@ class PresensiController {
 
       if (!attendance) {
         req.session.errorMsg = "Presensi tidak ditemukan.";
-        return res.redirect(`/?page=${page}`);
+        return res.redirect(`/presensi?page=${page}`);
       }
 
       if (clock_out) attendance.clock_out = clock_out;
@@ -85,8 +89,9 @@ class PresensiController {
       await attendance.save();
 
       req.session.successMsg = "Presensi berhasil diperbarui.";
-      res.redirect(`/?page=${page}`);
+      res.redirect(`/presensi?page=${page}`);
     } catch (error) {
+      console.error("Error updating presensi:", error);
       next(error);
     }
   }
@@ -99,11 +104,11 @@ class PresensiController {
       const result = await PresensiModel.deleteById(id);
 
       req.session.successMsg = result.successMsg;
-      res.redirect(`/?page=${page}`);
+      res.redirect(`/presensi?page=${page}`);
     } catch (error) {
-      console.error("Error saat menghapus presensi:", error);
+      console.error("Error deleting presensi:", error);
       req.session.errorMsg = error.message;
-      res.redirect(`/?page=${page}`);
+      res.redirect(`/presensi?page=${page}`);
     }
   }
 
@@ -114,7 +119,7 @@ class PresensiController {
       title: "Presensi",
       h1: "Presensi",
       presensi: results,
-      activePage: "Home",
+      activePage: "presensi",
     });
   }
 
@@ -125,7 +130,7 @@ class PresensiController {
       title: "Presensi",
       h1: "Presensi",
       presensi: results,
-      activePage: "Home",
+      activePage: "presensi",
     });
   }
 
@@ -146,43 +151,6 @@ class PresensiController {
       errorMsg: errorMsg,
       successMsg: successMsg,
     };
-  }
-
-  async getPresensi(req, res, next) {
-    try {
-      const page = parseInt(req.query.page) || 1;
-      const limit = 5;
-      const startIndex = (page - 1) * limit;
-
-      const presensiList = await PresensiModel.getPaginatedPresensi(
-        startIndex,
-        limit
-      );
-      const totalCount = await PresensiModel.countDocuments();
-
-      const results = {
-        results: presensiList,
-        page: page,
-        totalCount: totalCount,
-        previous: page > 1 ? { page: page - 1 } : null,
-        next: startIndex + limit < totalCount ? { page: page + 1 } : null,
-        errorMsg: req.session.errorMsg || "",
-        successMsg: req.session.successMsg || "",
-      };
-
-      // Clear the session messages after they've been used
-      req.session.errorMsg = "";
-      req.session.successMsg = "";
-
-      res.render("presensiView", {
-        title: "Presensi",
-        h1: "Presensi",
-        presensi: results,
-        activePage: "Home",
-      });
-    } catch (error) {
-      next(error);
-    }
   }
 }
 

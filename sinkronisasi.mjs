@@ -7,6 +7,7 @@ const syncDatabase = async () => {
     console.log("Database & tables created!");
   } catch (error) {
     console.error("Unable to create tables:", error);
+    throw error; // Rethrow the error to catch it in the error handling middleware
   }
 };
 

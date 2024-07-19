@@ -1,4 +1,3 @@
-// routes/presensiRoutes.mjs
 import express from "express";
 import presensiController from "../controllers/presensiController.mjs";
 
