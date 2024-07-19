@@ -70,16 +70,13 @@ class PresensiController {
     try {
       const { id } = req.params;
       const { clock_out, reason } = req.body;
-      console.log("Data yang diterima dari form:", req.body);
+      const page = req.query.page || 1;
 
       const attendance = await PresensiModel.findById(id);
-      console.log("Data yang ditemukan:", attendance);
 
       if (!attendance) {
-        return this.renderPresensiViewWithError(
-          res,
-          "Presensi tidak ditemukan."
-        );
+        req.session.errorMsg = "Presensi tidak ditemukan.";
+        return res.redirect(`/?page=${page}`);
       }
 
       if (clock_out) attendance.clock_out = clock_out;
@@ -87,7 +84,8 @@ class PresensiController {
 
       await attendance.save();
 
-      this.renderPresensiViewWithSuccess(res, "Presensi berhasil diperbarui.");
+      req.session.successMsg = "Presensi berhasil diperbarui.";
+      res.redirect(`/?page=${page}`);
     } catch (error) {
       next(error);
     }
@@ -96,15 +94,16 @@ class PresensiController {
   async deletePresensi(req, res, next) {
     try {
       const { id } = req.params;
-      console.log("Menghapus presensi dengan ID:", id);
+      const page = req.query.page || 1;
 
       const result = await PresensiModel.deleteById(id);
-      console.log("Hasil penghapusan:", result);
 
-      this.renderPresensiViewWithSuccess(res, result.successMsg);
+      req.session.successMsg = result.successMsg;
+      res.redirect(`/?page=${page}`);
     } catch (error) {
       console.error("Error saat menghapus presensi:", error);
-      this.renderPresensiViewWithError(res, error.message);
+      req.session.errorMsg = error.message;
+      res.redirect(`/?page=${page}`);
     }
   }
 
@@ -147,6 +146,43 @@ class PresensiController {
       errorMsg: errorMsg,
       successMsg: successMsg,
     };
+  }
+
+  async getPresensi(req, res, next) {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = 5;
+      const startIndex = (page - 1) * limit;
+
+      const presensiList = await PresensiModel.getPaginatedPresensi(
+        startIndex,
+        limit
+      );
+      const totalCount = await PresensiModel.countDocuments();
+
+      const results = {
+        results: presensiList,
+        page: page,
+        totalCount: totalCount,
+        previous: page > 1 ? { page: page - 1 } : null,
+        next: startIndex + limit < totalCount ? { page: page + 1 } : null,
+        errorMsg: req.session.errorMsg || "",
+        successMsg: req.session.successMsg || "",
+      };
+
+      // Clear the session messages after they've been used
+      req.session.errorMsg = "";
+      req.session.successMsg = "";
+
+      res.render("presensiView", {
+        title: "Presensi",
+        h1: "Presensi",
+        presensi: results,
+        activePage: "Home",
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 }
 

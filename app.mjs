@@ -7,6 +7,7 @@ import { Server as SocketIo } from "socket.io";
 import expressLayouts from "express-ejs-layouts";
 import morgan from "morgan";
 import methodOverride from "method-override";
+import session from "express-session"; // Import express-session
 import presensiRoutes from "./routes/presensiRoutes.mjs";
 import reasonRoutes from "./routes/reasonRoutes.mjs";
 import errorRoutes from "./routes/errorRoutes.mjs";
@@ -23,6 +24,16 @@ app.use(morgan("combined"));
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.urlencoded({ extended: true }));
+
+// Session setup
+app.use(
+  session({
+    secret: "your_secret_key", // Ganti dengan kunci rahasia Anda
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }, // Ubah menjadi true jika menggunakan HTTPS
+  })
+);
 
 // Set view engine to EJS
 app.set("view engine", "ejs");

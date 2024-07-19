@@ -1,4 +1,11 @@
+// index.js
 document.addEventListener("DOMContentLoaded", function () {
+  // Tampilkan pesan sukses jika ada
+  const successMsg = document.getElementById("success-msg");
+  if (successMsg) {
+    alert(successMsg.textContent);
+  }
+
   // Event listener untuk delete
   document.querySelectorAll(".delete-button").forEach((button) => {
     button.addEventListener("click", function (event) {
@@ -23,8 +30,41 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   });
-  const socket = io();
 
+  // Event listener untuk update
+  window.submitUpdateForm = function (event, form) {
+    event.preventDefault();
+    const id = form.querySelector('input[name="id"]').value;
+    const page = form.querySelector('input[name="page"]').value; // Get page value
+    const formData = new FormData(form);
+    const data = {};
+    formData.forEach((value, key) => {
+      data[key] = value;
+    });
+
+    fetch(`/update-presensi/${id}?page=${page}`, {
+      // Include page parameter in URL
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => {
+        if (response.ok) {
+          window.location.reload();
+        } else {
+          alert("Error updating presensi");
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        alert("Error updating presensi");
+      });
+  };
+
+  // WebSocket untuk update real-time
+  const socket = io();
   socket.on("newPresensi", (data) => {
     const currentPage =
       parseInt(document.getElementById("page-number").value) || 1;
@@ -64,33 +104,4 @@ document.addEventListener("DOMContentLoaded", function () {
     dateFormat: "Y-m-d H:i:S",
     time_24hr: true,
   });
-
-  window.submitUpdateForm = function (event, form) {
-    event.preventDefault();
-    const id = form.querySelector('input[name="id"]').value;
-    const formData = new FormData(form);
-    const data = {};
-    formData.forEach((value, key) => {
-      data[key] = value;
-    });
-
-    fetch(`/update-presensi/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => {
-        if (response.ok) {
-          window.location.reload();
-        } else {
-          alert("Error updating presensi");
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        alert("Error updating presensi");
-      });
-  };
 });
