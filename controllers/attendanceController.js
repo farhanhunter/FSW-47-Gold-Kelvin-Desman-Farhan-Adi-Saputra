@@ -24,9 +24,17 @@ exports.getAttendanceById = async (req, res) => {
 
 exports.createAttendance = async (req, res) => {
   try {
-    const attendance = await Attendance.create(req.body);
+    console.log(req.body); // Log request body untuk debugging
+    const { user_id, schedule_id, attendance_time, attendance_type } = req.body;
+    const attendance = await Attendance.create({
+      user_id,
+      schedule_id,
+      attendance_time: new Date(attendance_time), // Pastikan waktu diproses sebagai objek Date
+      attendance_type,
+    });
     res.status(201).json(attendance);
   } catch (error) {
+    console.error("Error creating attendance:", error); // Log error untuk debugging
     res.status(500).json({ error: error.message });
   }
 };
