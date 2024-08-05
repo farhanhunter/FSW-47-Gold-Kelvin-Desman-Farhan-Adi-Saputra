@@ -1,4 +1,4 @@
-const { Attendance } = require("../models");
+const { Attendance, AttendanceSchedule, User } = require("../models");
 
 exports.getAllAttendances = async (req, res) => {
   try {
@@ -25,16 +25,53 @@ exports.getAttendanceById = async (req, res) => {
 exports.createAttendance = async (req, res) => {
   try {
     console.log(req.body); // Log request body untuk debugging
-    const { user_id, schedule_id, attendance_time, attendance_type } = req.body;
+    const { schedule_id, attendance_time, attendance_type } = req.body;
+    const userId = req.userId;
+
+    // Cari user untuk mendapatkan company_id
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Validasi data
+    if (!schedule_id || !attendance_time || !attendance_type) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    // Pastikan schedule_id ada
+    const schedule = await AttendanceSchedule.findByPk(schedule_id);
+    if (!schedule) {
+      return res.status(404).json({ message: "Schedule not found" });
+    }
+
+    // Proses waktu kehadiran sebagai objek Date
+    const attendanceTime = new Date(attendance_time);
+
+    // Cek apakah pengguna sudah mencatat kehadiran
+    const existingAttendance = await Attendance.findOne({
+      where: {
+        user_id: userId,
+        schedule_id: schedule_id,
+        attendance_type: attendance_type,
+      },
+    });
+    if (existingAttendance) {
+      return res.status(400).json({ message: "Attendance already recorded" });
+    }
+
+    // Buat kehadiran baru
     const attendance = await Attendance.create({
-      user_id,
+      user_id: userId,
+      company_id: user.company_id,
       schedule_id,
-      attendance_time: new Date(attendance_time), // Pastikan waktu diproses sebagai objek Date
+      attendance_time: attendanceTime,
       attendance_type,
     });
+
     res.status(201).json(attendance);
   } catch (error) {
-    console.error("Error creating attendance:", error); // Log error untuk debugging
+    console.error("Error creating attendance:", error);
     res.status(500).json({ error: error.message });
   }
 };

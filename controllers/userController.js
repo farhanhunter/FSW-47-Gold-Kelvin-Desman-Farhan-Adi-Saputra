@@ -103,27 +103,25 @@ exports.deleteUser = async (req, res) => {
 exports.authenticateUser = async (req, res) => {
   try {
     const { username, password } = req.body;
-    console.log(`Username: ${username}, Password: ${password}`);
     const user = await User.findOne({ where: { username } });
     if (user) {
-      console.log(`User found: ${user.username}`);
       const isValidPassword = bcrypt.compareSync(password, user.password);
-      console.log(`Entered password valid: ${isValidPassword}`);
       if (isValidPassword) {
         const token = jwt.sign({ id: user.user_id }, jwtSecret, {
           expiresIn: "1h",
         });
-        res.json({ message: "Authentication successful", token, user });
+        res.json({
+          message: "Authentication successful",
+          token,
+          userId: user.user_id,
+        });
       } else {
-        console.log("Invalid password");
         res.status(401).json({ message: "Invalid credentials" });
       }
     } else {
-      console.log("User not found");
       res.status(401).json({ message: "Invalid credentials" });
     }
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };
