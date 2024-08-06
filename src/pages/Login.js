@@ -16,6 +16,7 @@ export default function Login() {
         password: password,
       });
       console.log(response.data);
+      localStorage.setItem("token", response.data.token); // Simpan token di localStorage
       toast.success("Login successful!");
       navigate("/");
     } catch (error) {
@@ -35,7 +36,7 @@ export default function Login() {
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
             <label
-              htmlFor="email"
+              htmlFor="username"
               className="block text-sm font-medium leading-6 text-gray-900"
             >
               Username

@@ -1,8 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AttendanceList from "./components/AttendanceList";
+import Header from "./components/Header";
+import Navbar from "./components/Navbar"; // Import Navbar
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Login from "./pages/Login";
@@ -12,20 +14,8 @@ function App() {
   return (
     <Router>
       <div className="App bg-gray-100 min-h-screen">
-        <nav className="flex justify-center space-x-4 p-4 bg-blue-500 text-white">
-          <Link to="/" className="hover:underline">
-            Home
-          </Link>
-          <Link to="/about" className="hover:underline">
-            About
-          </Link>
-          <Link to="/login" className="hover:underline">
-            Login
-          </Link>
-          <Link to="/register" className="hover:underline">
-            Register
-          </Link>
-        </nav>
+        <Navbar /> {/* Gunakan Navbar */}
+        <Header /> {/* Gunakan Header */}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
