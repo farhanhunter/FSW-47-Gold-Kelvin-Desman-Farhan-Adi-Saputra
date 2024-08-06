@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 
 export default function UserProfile() {
   const [user, setUser] = useState(null);

@@ -1,10 +1,10 @@
 import React from "react";
+import ClockPage from "./ClockPage";
 
 function Home() {
   return (
     <div className="home">
-      <h2 className="text-2xl font-bold">Welcome to the Attendance System</h2>
-      <p className="mt-2">This is the home page.</p>
+      <ClockPage />
     </div>
   );
 }
