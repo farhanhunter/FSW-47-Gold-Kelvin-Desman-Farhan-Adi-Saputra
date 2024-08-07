@@ -4,7 +4,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AttendanceList from "./components/AttendanceList";
 import Header from "./components/Header";
-import Navbar from "./components/Navbar"; // Import Navbar
+import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Login from "./pages/Login";
@@ -14,8 +14,8 @@ function App() {
   return (
     <Router>
       <div className="App bg-gray-100 min-h-screen">
-        <Navbar /> {/* Gunakan Navbar */}
-        <Header /> {/* Gunakan Header */}
+        <Navbar />
+        <Header />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />

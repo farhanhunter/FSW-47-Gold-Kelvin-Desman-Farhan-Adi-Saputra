@@ -1,27 +1,37 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const LiveAttendance = () => {
   const [schedule, setSchedule] = useState(null);
-  const [attendance, setAttendance] = useState(null);
+  const [attendance, setAttendance] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     const fetchAttendanceData = async () => {
       try {
-        const token = localStorage.getItem("token"); // Pastikan token disimpan di localStorage saat login
+        const token = localStorage.getItem("token");
         const config = {
           headers: { Authorization: `Bearer ${token}` },
         };
 
-        // Ganti URL dengan endpoint yang sesuai di backend Anda
+        // Fetch user profile to get userId
+        const profileResponse = await axios.get(
+          "http://localhost:3000/api/profile",
+          config
+        );
+        setUserId(profileResponse.data.user_id);
+
+        // Fetch attendance schedule
         const scheduleResponse = await axios.get(
           "http://localhost:3000/api/attendance-schedules",
           config
         );
-        setSchedule(scheduleResponse.data[0]); // Mengambil data pertama dari array
+        setSchedule(scheduleResponse.data[0]);
 
+        // Fetch attendance log
         const attendanceResponse = await axios.get(
           "http://localhost:3000/api/attendances",
           config
@@ -37,6 +47,56 @@ const LiveAttendance = () => {
 
     fetchAttendanceData();
   }, []);
+
+  const clockIn = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+      };
+
+      const response = await axios.post(
+        "http://localhost:3000/api/attendances",
+        {
+          user_id: userId,
+          schedule_id: schedule.schedule_id,
+          attendance_time: new Date().toISOString(),
+          attendance_type: "clock_in",
+        },
+        config
+      );
+      setAttendance([...attendance, response.data]);
+      toast.success("Clock In successful!");
+    } catch (error) {
+      setError(error.response ? error.response.data.message : error.message);
+      toast.error("Clock In failed!");
+    }
+  };
+
+  const clockOut = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+      };
+
+      const response = await axios.post(
+        "http://localhost:3000/api/attendances",
+        {
+          user_id: userId,
+          schedule_id: schedule.schedule_id,
+          attendance_time: new Date().toISOString(),
+          attendance_type: "clock_out",
+        },
+        config
+      );
+      setAttendance([...attendance, response.data]);
+      toast.success("Clock Out successful!");
+    } catch (error) {
+      setError(error.response ? error.response.data.message : error.message);
+      toast.error("Clock Out failed!");
+    }
+  };
 
   if (loading) {
     return <p>Loading...</p>;
@@ -76,10 +136,16 @@ const LiveAttendance = () => {
         ></textarea>
       </div>
       <div className="flex space-x-4 mt-4">
-        <button className="w-full bg-blue-500 text-white py-2 rounded-md">
+        <button
+          onClick={clockIn}
+          className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
+        >
           Clock In
         </button>
-        <button className="w-full bg-blue-500 text-white py-2 rounded-md">
+        <button
+          onClick={clockOut}
+          className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
+        >
           Clock Out
         </button>
       </div>
@@ -89,7 +155,14 @@ const LiveAttendance = () => {
         </div>
         {attendance && attendance.length > 0 ? (
           <div className="text-center bg-white shadow rounded-lg py-10">
-            {/* Render attendance log here */}
+            {attendance.map((log, index) => (
+              <div key={index}>
+                <p>
+                  {new Date(log.attendance_time).toLocaleString()} -{" "}
+                  {log.attendance_type}
+                </p>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="text-center bg-white shadow rounded-lg py-10">
